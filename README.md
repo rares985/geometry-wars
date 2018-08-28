@@ -1,2 +1,2 @@
 # geometry-wars
-2D space shooter with several powerups
+OpenGL 2D space shooter with several powerups
