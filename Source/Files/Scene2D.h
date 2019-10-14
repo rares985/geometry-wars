@@ -1,10 +1,16 @@
 #pragma once
 
+#ifndef SCENE_2D_H_
+#define SCENE_2D_H_
+
 #include <Component/SimpleScene.h>
 #include <string>
 #include <Core/Engine.h>
 
 #include "GameObject.h"
+#include "Player.h"
+
+
 
 class Scene2D : public SimpleScene
 {
@@ -71,12 +77,14 @@ class Scene2D : public SimpleScene
 		glm::mat3 vis_matrix;
 		glm::vec3 background_color;
 
-		GameObject* player_ship;
+		Player* player_ship;
 		std::vector<GameObject*> enemies;
 		std::vector<GameObject*> projectiles;
 		std::vector<GameObject*> powerups;
 
 		float length;
+
+		int score;
 
 		float time_elapsed;
 		float enemy_spawn_timer;
@@ -85,8 +93,8 @@ class Scene2D : public SimpleScene
 		float powerup_spawn_threshold;
 		float freeze_timer;
 
-		int score;
-
 		bool end_game;
 		bool freeze_enemies;
 };
+
+#endif /* SCENE_2D_H_ */

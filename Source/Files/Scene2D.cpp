@@ -1,4 +1,5 @@
 #include "Scene2D.h"
+#include "Player.h"
 
 #include <vector>
 #include <iostream>
@@ -10,6 +11,7 @@
 #include "Transform2D.h"
 #include "Object2D.h"
 #include "constants.h"
+#include "GameInfo.h"
 
 using namespace std;
 
@@ -40,14 +42,14 @@ void Scene2D::Init()
 
 	/* Create the meshes we  will use */
 
-	Mesh* player_mesh = Object2D::CreateShip("ship", origin, PLAYER_SIZE, ivory, true);
-	Mesh* projectile_mesh = Object2D::CreateProjectile("projectile", glm::vec3(0, 0, 0), PROJECTILE_SIZE, yellow, true);
-	Mesh* weak_enemy_mesh = Object2D::CreateShip("weak_enemy_ship", origin, DEFAULT_ENEMY_SIZE, deepskyblue, true);
-	Mesh* strong_enemy_mesh = Object2D::CreateShip("strong_enemy_ship", origin, DEFAULT_ENEMY_SIZE, gold, true);
-	Mesh* shrinked_enemy_mesh = Object2D::CreateShip("shrinked_enemy_ship", origin, SHRINKED_ENEMY_SIZE, firebrick, true);
-	Mesh* lives_mesh = Object2D::CreateLifeMesh("lives",origin,LIVES_SIZE, ivory,true);
-	Mesh* life_powerup_mesh = Object2D::CreateLifePowerup("life", origin, LIFE_POWERUP_SIZE, forestgreen, true);
-	Mesh* freeze_powerup_mesh = Object2D::CreateFreezePowerup("freeze", origin, FREEZE_POWERUP_SIZE, aquamarine, true);
+	Mesh* player_mesh = Object2D::GetShipMesh("ship", origin, PLAYER_SIZE, ivory, true);
+	Mesh* projectile_mesh = Object2D::GetProjectileMesh("projectile", glm::vec3(0, 0, 0), PROJECTILE_SIZE, yellow, true);
+	Mesh* weak_enemy_mesh = Object2D::GetShipMesh("weak_enemy_ship", origin, DEFAULT_ENEMY_SIZE, deepskyblue, true);
+	Mesh* strong_enemy_mesh = Object2D::GetShipMesh("strong_enemy_ship", origin, DEFAULT_ENEMY_SIZE, gold, true);
+	Mesh* shrinked_enemy_mesh = Object2D::GetShipMesh("shrinked_enemy_ship", origin, SHRINKED_ENEMY_SIZE, firebrick, true);
+	Mesh* lives_mesh = Object2D::GetLifeIndicatorMesh("lives",origin,LIVES_SIZE, ivory,true);
+	Mesh* life_powerup_mesh = Object2D::GetLifePowerupMesh("life", origin, LIFE_POWERUP_SIZE, forestgreen, true);
+	Mesh* freeze_powerup_mesh = Object2D::GetFreezePowerupMesh("freeze", origin, FREEZE_POWERUP_SIZE, aquamarine, true);
 
 	AddMeshToList(player_mesh);
 	AddMeshToList(projectile_mesh);
@@ -59,11 +61,14 @@ void Scene2D::Init()
 	AddMeshToList(freeze_powerup_mesh);
 
 	/* Create the player object */
-	player_ship = new GameObject(player_mesh,"ship",origin,PLAYER_SIZE, ivory);
-	player_ship->tx = logic_space.width/2;
-	player_ship->ty = logic_space.height/2;
-	player_ship->lives_left = 3;
-	player_ship->initial_lives = 3;
+	player_ship = new Player();
+	player_ship->setCenter(origin);
+	player_ship->setMeshInfo(player_mesh, "ship");
+	player_ship->setSize(PLAYER_SIZE);
+	player_ship->setColor(ivory);
+
+	player_ship->setInitialPosition(logic_space.width / 2, logic_space.height / 2);
+
 
 	/* set the game variables */
 	end_game = false;
@@ -189,21 +194,23 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 	
 	/* render the player's ship */
 
-	player_ship->model_matrix = vis_matrix;
-	player_ship->model_matrix *= Transform2D::Translate(player_ship->tx, player_ship->ty);
-	player_ship->model_matrix *= Transform2D::Rotate(player_ship->rotation);
+	player_ship->computeModelMatrix(vis_matrix);
 
-	RenderMesh2D(meshes["ship"],shaders["VertexColor"],player_ship->model_matrix);
+	RenderMesh2D(meshes["ship"],shaders["VertexColor"],player_ship->getModelMatrix());
 	
 
 	/* Render projectiles and check for enemy-projectile collision */
 	for (auto proj : projectiles) {
 
-		proj->model_matrix = vis_matrix;
-		proj->tx += proj->x_speed*24*deltaTimeSeconds;
-		proj->ty += proj->y_speed*24*deltaTimeSeconds;
-		proj->model_matrix *= Transform2D::Translate(proj->tx, proj->ty);
-		proj->model_matrix *= Transform2D::Rotate(proj->rotation);
+		float dtx = proj->x_speed * 24 * deltaTimeSeconds;
+		float dty = proj->y_speed * 24 * deltaTimeSeconds;
+
+		proj->tx += dtx;
+		proj->ty += dty;
+
+		proj->computeModelMatrix(vis_matrix);
+
+
 
 		/* check for enemy-projectile collision */
 		for (auto enemy : enemies) {
@@ -214,8 +221,6 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 					if (enemy->lives_left == 1) {
 						enemy->should_render = false;
 						enemy->lives_left = 0;
-						score += enemy->initial_lives;
-						cout << "Score: " << score << "\n";
 						break; /* one projectile can damage 1 enemy only */
 					}
 					if (enemy->lives_left == 2) {
@@ -228,7 +233,7 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 			}
 		}
 		if (proj->should_render == true)
-			RenderMesh2D(proj->mesh, shaders["VertexColor"], proj->model_matrix);
+			RenderMesh2D(proj->mesh, shaders["VertexColor"], proj->getModelMatrix());
 	}
 
 
@@ -243,19 +248,19 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 			enemy->mesh_name = "shrinked_enemy_ship";
 			enemy->x_speed *= 2;
 			enemy->y_speed *= 2;
-			enemy->color = firebrick;
+			enemy->setColor(firebrick);
 			if (enemy->scale > 0.75f)
 				enemy->scale -= (0.5f*deltaTimeSeconds) / SHRINK_ANIMATION_DURATION; /* and it shrinks over 250ms to half size */
 		}
 
 		if (!freeze_enemies) {
+			float delta_tx = enemy->x_speed * deltaTimeSeconds;
+			float delta_ty = enemy->y_speed * deltaTimeSeconds;
+			
+			enemy->tx += delta_tx;
+			enemy->ty += delta_ty;
 
-			enemy->model_matrix = vis_matrix;
-			enemy->tx += enemy->x_speed  * deltaTimeSeconds;
-			enemy->ty += enemy->y_speed  * deltaTimeSeconds;
-			enemy->model_matrix *= Transform2D::Translate(enemy->tx, enemy->ty);
-			enemy->model_matrix *= Transform2D::Rotate(enemy->rotation);
-			enemy->model_matrix *= Transform2D::Scale(enemy->scale,enemy->scale);
+			enemy->computeModelMatrix(vis_matrix);
 		}
 
 		
@@ -333,7 +338,12 @@ void Scene2D::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 {
 	if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_LEFT)) {
 		
-		GameObject* projectile = new GameObject(meshes["projectile"], "projectile", origin,PROJECTILE_SIZE, yellow);
+		GameObject* projectile = new GameObject();
+		projectile->setCenter(origin);
+		projectile->setMeshInfo(meshes["projectile"], "projectile");
+		projectile->setSize(PROJECTILE_SIZE);
+		projectile->setColor(yellow);
+
 		projectile->tx = player_ship->tx;
 		projectile->ty = player_ship->ty;
 
@@ -378,7 +388,11 @@ void Scene2D::spawnEnemies() {
 				mesh_name = "strong_enemy_ship";
 				color = gold;
 			}
-			enemy = new GameObject(meshes[mesh_name], mesh_name, origin, DEFAULT_ENEMY_SIZE, color);
+			enemy = new GameObject();
+			enemy->setCenter(origin);
+			enemy->setMeshInfo(meshes[mesh_name], mesh_name);
+			enemy->setSize(DEFAULT_ENEMY_SIZE);
+			enemy->setColor(color);
 
 			enemy->initial_lives = lives_count;
 			enemy->lives_left = enemy->initial_lives;
@@ -414,7 +428,7 @@ bool Scene2D::checkCollision(GameObject* first, GameObject* second) {
 	float xdist = first->tx - second->tx;
 	float ydist = first->ty - second->ty;
 	float abs_dist = xdist*xdist + ydist*ydist;
-	float radii_dist = (first->size + second->size) * (first->size + second->size);
+	float radii_dist = (first->getSize() + second->getSize()) * (first->getSize() + second->getSize());
 	return (abs_dist <= radii_dist);
 }
 
@@ -457,7 +471,7 @@ void Scene2D::spawnPowerup() {
 
 	glm::vec3 color;
 	std::string mesh_name;
-	float size;
+	float size = 0.0f;
 
 	if (powerup_type == 1) {
 		mesh_name = "life";
@@ -470,7 +484,12 @@ void Scene2D::spawnPowerup() {
 		color = darkcyan;
 		size = FREEZE_POWERUP_SIZE;
 	}
-	GameObject* powerup = new GameObject(meshes[mesh_name], mesh_name, origin, size, color);
+	GameObject* powerup = new GameObject();
+	powerup->setCenter(origin);
+	powerup->setMeshInfo(meshes[mesh_name], mesh_name);
+	powerup->setSize(size);
+	powerup->setColor(color);
+
 	powerup->tx = x_pos;
 	powerup->ty = y_pos;
 

@@ -2,7 +2,18 @@
 
 #include <Core/Engine.h>
 
-Mesh* Object2D::CreateShip(std::string name, glm::vec3 center, float radius, glm::vec3 color, bool fill) {
+Mesh* CreateMesh(std::string name, std::vector <VertexFormat> &vertices, std::vector<unsigned short> &indices, bool fill) {
+	Mesh* new_mesh = new Mesh(name);
+
+	if (!fill) {
+		new_mesh->SetDrawMode(GL_LINE_LOOP);
+	}
+	new_mesh->InitFromData(vertices, indices);
+
+	return new_mesh;
+}
+
+Mesh* Object2D::GetShipMesh(std::string name, glm::vec3 center, float radius, glm::vec3 color, bool fill) {
 	std::vector<VertexFormat> vertices =
 	{
 		VertexFormat(center + glm::vec3(-radius,-radius,0),color),
@@ -12,68 +23,44 @@ Mesh* Object2D::CreateShip(std::string name, glm::vec3 center, float radius, glm
 		VertexFormat(center + glm::vec3(radius,-radius,0), color)
 	};
 
-	Mesh* ship = new Mesh(name);
 	std::vector<unsigned short> indices = { 1,3,2,2,0,4 };
 
-	if (!fill) {
-		ship->SetDrawMode(GL_LINE_LOOP);
-	}
-	else {
-
-	}
-	ship->InitFromData(vertices, indices);
-	return ship;
+	return CreateMesh(name, vertices, indices, fill);
 }
 
-Mesh* Object2D::CreateProjectile(std::string name, glm::vec3 center, float length, glm::vec3 color, bool fill) {
+Mesh* Object2D::GetProjectileMesh(std::string name, glm::vec3 center, float length, glm::vec3 color, bool fill) {
 	std::vector<VertexFormat> vertices =
 	{
 		VertexFormat(center, color),
-		VertexFormat(center + glm::vec3(-length  ,length /4 ,0) ,color),
-		VertexFormat(center + glm::vec3(length ,length/4,0) ,color),
-		VertexFormat(center + glm::vec3(length ,-length/4,0) ,color),
-		VertexFormat(center + glm::vec3(-length ,-length/4,0) ,color)
+		VertexFormat(center + glm::vec3(-length, length / 4		,0),	color),
+		VertexFormat(center + glm::vec3(length,  length / 4,	0),		color),
+		VertexFormat(center + glm::vec3(length,  -length / 4,	0),		color),
+		VertexFormat(center + glm::vec3(-length, -length / 4,	0),		color)
 	};
 
-
-	Mesh* projectile = new Mesh(name);
 	std::vector<unsigned short> indices = { 0,1,2,2,0,3,3,0,4,4,0,1 };
 
-	if (!fill) {
-		projectile->SetDrawMode(GL_LINE_LOOP);
-	}
-	else {
 
-	}
-	projectile->InitFromData(vertices, indices);
-	return projectile;
+	return CreateMesh(name, vertices, indices, fill);
 }
 
-Mesh* Object2D::CreateLifeMesh(std::string name, glm::vec3 center, float length, glm::vec3 color, bool fill) {
+Mesh* Object2D::GetLifeIndicatorMesh(std::string name, glm::vec3 center, float length, glm::vec3 color, bool fill) {
 	std::vector<VertexFormat> vertices =
 	{
 		VertexFormat(center, color),
-		VertexFormat(center + glm::vec3(-length / 4  ,length ,0) ,color),
-		VertexFormat(center + glm::vec3(length / 4 ,length,0) ,color),
-		VertexFormat(center + glm::vec3(length / 4 ,-length,0) ,color),
-		VertexFormat(center + glm::vec3(-length / 4 ,-length,0) ,color)
+		VertexFormat(center + glm::vec3(-length / 4,	length,	0),	color),
+		VertexFormat(center + glm::vec3(length / 4,		length,	0),	color),
+		VertexFormat(center + glm::vec3(length / 4,		-length,	0) ,color),
+		VertexFormat(center + glm::vec3(-length / 4,	-length,	0) ,color)
 	};
 
 
-	Mesh* projectile = new Mesh(name);
 	std::vector<unsigned short> indices = { 0,1,2,2,0,3,3,0,4,4,0,1 };
 
-	if (!fill) {
-		projectile->SetDrawMode(GL_LINE_LOOP);
-	}
-	else {
-
-	}
-	projectile->InitFromData(vertices, indices);
-	return projectile;
+	return CreateMesh(name, vertices, indices, fill);
 }
 
-Mesh* Object2D::CreateLifePowerup(std::string name, glm::vec3 center, float size, glm::vec3 color, bool fill) {
+Mesh* Object2D::GetLifePowerupMesh(std::string name, glm::vec3 center, float size, glm::vec3 color, bool fill) {
 	std::vector<VertexFormat> vertices =
 	{
 		VertexFormat(center,color),
@@ -90,7 +77,6 @@ Mesh* Object2D::CreateLifePowerup(std::string name, glm::vec3 center, float size
 		VertexFormat(center + glm::vec3(-size,-size / 3,0),color),
 		VertexFormat(center + glm::vec3(-size,size / 3,0),color)
 	};
-	Mesh* m = new Mesh(name);
 	std::vector<unsigned short> indices = 
 	{	0, 1, 4,
 		4, 1, 2,
@@ -104,11 +90,10 @@ Mesh* Object2D::CreateLifePowerup(std::string name, glm::vec3 center, float size
 		10, 11, 12,
 		12,1,10,
 		10,1,0 };
-	m->InitFromData(vertices, indices);
-	return m;
+	return CreateMesh(name, vertices, indices, fill);
 }
 
-Mesh* Object2D::CreateFreezePowerup(std::string name, glm::vec3 center, float length, glm::vec3 color, bool fill) {
+Mesh* Object2D::GetFreezePowerupMesh(std::string name, glm::vec3 center, float length, glm::vec3 color, bool fill) {
 	std::vector<VertexFormat> vertices =
 	{
 		VertexFormat(center, color),
@@ -118,16 +103,7 @@ Mesh* Object2D::CreateFreezePowerup(std::string name, glm::vec3 center, float le
 		VertexFormat(center + glm::vec3(-length ,length ,0) ,color)
 	};
 
-
-	Mesh* projectile = new Mesh(name);
 	std::vector<unsigned short> indices = { 0,1,2,2,0,3,3,0,4,4,0,1 };
 
-	if (!fill) {
-		projectile->SetDrawMode(GL_LINE_LOOP);
-	}
-	else {
-
-	}
-	projectile->InitFromData(vertices, indices);
-	return projectile;
+	return CreateMesh(name, vertices, indices, fill);
 }

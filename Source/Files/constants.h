@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Core/Engine.h"
+#ifndef CONSTANTS_H_
+#define CONSTANTS_H_
 
-#ifndef _CONSTANTS_H_
-#define _CONSTANTS_H_
+#include "Core/Engine.h"
 
 /* various mesh sizes */
 #define PLAYER_SIZE 0.4f

@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef TRANSFORM_2D_H_
+#define TRANSFORM_2D_H_
+
 #include <include/glm.h>
 
 namespace Transform2D
@@ -37,3 +40,5 @@ namespace Transform2D
 		);
 	}
 }
+
+#endif /* TRANSFORM_2D_H_ */

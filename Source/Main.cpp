@@ -7,12 +7,14 @@
 
 using namespace std;
 
+#define WINDOW_WIDTH_PX		1280
+#define WINDOW_HEIGHT_PX	720
 
 int main(int argc, char **argv)
 {
 	
 	WindowProperties wp;
-	wp.resolution = glm::ivec2(1280, 720);
+	wp.resolution = glm::ivec2(WINDOW_WIDTH_PX, WINDOW_HEIGHT_PX);
 
 	WindowObject* window = Engine::Init(wp);
 
