@@ -18,10 +18,33 @@ using namespace std;
 Scene2D::Scene2D()
 {
 	game_instance = new GameInstance();
+	freeze_enemies = false;
+
+	enemy_spawn_threshold = INITIAL_SPAWN_TIME;
+
+	/* define the logic space and width */
+	logic_space.x = 0;
+	logic_space.y = 0;
+	logic_space.width = LOGIC_WINDOW_WIDTH;
+	logic_space.height = LOGIC_WINDOW_HEIGHT;
+
+	background_color = black;
+
+	player_ship = new Player();
 }
 
 Scene2D::~Scene2D()
 {
+	delete player_ship;
+	for (auto obj : projectiles) {
+		delete obj;
+	}
+	for (auto obj : enemies) {
+		delete obj;
+	}
+	for (auto obj : powerups) {
+		delete obj;
+	}
 }
 
 void Scene2D::Init()
@@ -33,13 +56,7 @@ void Scene2D::Init()
 	camera->Update();
 	GetCameraInput()->SetActive(false);
 
-	/* define the logic space and width */
-	logic_space.x = 0;		
-	logic_space.y = 0;		
-	logic_space.width = LOGIC_WINDOW_WIDTH;	
-	logic_space.height = LOGIC_WINDOW_HEIGHT;	
 
-	background_color = black;
 
 	/* Create the meshes we  will use */
 
@@ -62,7 +79,7 @@ void Scene2D::Init()
 	AddMeshToList(freeze_powerup_mesh);
 
 	/* Create the player object */
-	player_ship = new Player();
+
 	player_ship->setCenter(origin);
 	player_ship->setMeshInfo(player_mesh, "ship");
 	player_ship->setSize(PLAYER_SIZE);
@@ -72,9 +89,7 @@ void Scene2D::Init()
 
 
 	/* set the game variables */
-	freeze_enemies = false;
 
-	enemy_spawn_threshold = INITIAL_SPAWN_TIME;
 
 }
 
