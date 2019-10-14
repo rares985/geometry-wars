@@ -18,6 +18,7 @@ class GameObject {
 		void setColor(glm::vec3 color);
 		void setSize(float size);
 		void setCenter(glm::vec3 center);
+		std::string getMeshName();
 
 		void setInitialPosition(float tx, float ty);
 		void computeModelMatrix(glm::mat3 &vis_matrix);
@@ -27,6 +28,7 @@ class GameObject {
 		glm::vec3 getCenter();
 		glm::mat3 getModelMatrix();
 
+		bool collidesWith(GameObject* other);
 
 		/* Belong to future Mesh handler class */
 		Mesh* mesh;

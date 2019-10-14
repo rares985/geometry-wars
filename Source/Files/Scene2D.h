@@ -9,6 +9,8 @@
 
 #include "GameObject.h"
 #include "Player.h"
+#include "Powerup.h"
+#include "GameInstance.h"
 
 
 
@@ -62,8 +64,6 @@ class Scene2D : public SimpleScene
 
 		void spawnEnemies();
 
-		bool checkCollision(GameObject* a, GameObject* b);
-
 		void eraseInvisibleEntities();
 
 		void freezeScreen(glm::mat3 visMatrix);
@@ -80,11 +80,9 @@ class Scene2D : public SimpleScene
 		Player* player_ship;
 		std::vector<GameObject*> enemies;
 		std::vector<GameObject*> projectiles;
-		std::vector<GameObject*> powerups;
+		std::vector<Powerup*> powerups;
 
-		float length;
-
-		int score;
+		GameInstance* game_instance;
 
 		float time_elapsed;
 		float enemy_spawn_timer;
@@ -93,7 +91,6 @@ class Scene2D : public SimpleScene
 		float powerup_spawn_threshold;
 		float freeze_timer;
 
-		bool end_game;
 		bool freeze_enemies;
 };
 

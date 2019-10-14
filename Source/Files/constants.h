@@ -29,18 +29,18 @@
 
 
 /* rgb colour codes */
-glm::vec3 black = glm::vec3(0, 0, 0);
-glm::vec3 white = glm::vec3(1, 1, 1);
-glm::vec3 gold = glm::vec3(1, 0.843137, 0);
-glm::vec3 yellow = glm::vec3(1, 1, 0);
-glm::vec3 deepskyblue = glm::vec3(0, 0.74902, 1);
-glm::vec3 red = glm::vec3(1, 0, 0);
-glm::vec3 firebrick = glm::vec3(0.698039, 0.133333, 0.133333);
-glm::vec3 origin = glm::vec3(0, 0, 0);
-glm::vec3 green = glm::vec3(0, 1, 0);
-glm::vec3 aquamarine = glm::vec3 (0.498039f ,1.0f, 0.831373f);
-glm::vec3 darkcyan = glm::vec3(0, 0.545098, 0.545098);
-glm::vec3 forestgreen = glm::vec3(0.133333, 0.545098, 0.133333);
-glm::vec3 ivory = glm::vec3(1, 1, 0.941176);
+#define black  glm::vec3(0, 0, 0)
+#define white  glm::vec3(1, 1, 1)
+#define gold  glm::vec3(1, 0.843137, 0)
+#define yellow  glm::vec3(1, 1, 0)
+#define deepskyblue  glm::vec3(0, 0.74902, 1)
+#define red  glm::vec3(1, 0, 0)
+#define firebrick  glm::vec3(0.698039, 0.133333, 0.133333)
+#define origin  glm::vec3(0, 0, 0)
+#define green  glm::vec3(0, 1, 0)
+#define aquamarine  glm::vec3 (0.498039f ,1.0f, 0.831373f)
+#define darkcyan  glm::vec3(0, 0.545098, 0.545098)
+#define forestgreen  glm::vec3(0.133333, 0.545098, 0.133333)
+#define ivory  glm::vec3(1, 1, 0.941176)
 
 #endif
