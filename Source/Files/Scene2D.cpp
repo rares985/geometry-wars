@@ -20,6 +20,16 @@ Scene2D::Scene2D()
 	game_instance = new GameInstance();
 	freeze_enemies = false;
 
+	powerup_spawn_threshold = 0;
+	powerup_spawn_timer = 0;
+
+	enemy_spawn_threshold = 0;
+	enemy_spawn_timer = 0;
+
+	time_elapsed = 0;
+
+	freeze_timer = 0;
+
 	enemy_spawn_threshold = INITIAL_SPAWN_TIME;
 
 	/* define the logic space and width */
@@ -30,12 +40,12 @@ Scene2D::Scene2D()
 
 	background_color = black;
 
-	player_ship = new Player();
+	player = new Player();
 }
 
 Scene2D::~Scene2D()
 {
-	delete player_ship;
+	delete player;
 	for (auto obj : projectiles) {
 		delete obj;
 	}
@@ -55,7 +65,6 @@ void Scene2D::Init()
 	camera->SetRotation(glm::vec3(0, 0, 0));
 	camera->Update();
 	GetCameraInput()->SetActive(false);
-
 
 
 	/* Create the meshes we  will use */
@@ -78,18 +87,7 @@ void Scene2D::Init()
 	AddMeshToList(life_powerup_mesh);
 	AddMeshToList(freeze_powerup_mesh);
 
-	/* Create the player object */
-
-	player_ship->setCenter(origin);
-	player_ship->setMeshInfo(player_mesh, "ship");
-	player_ship->setSize(PLAYER_SIZE);
-	player_ship->setColor(ivory);
-
-	player_ship->setInitialPosition(logic_space.width / 2, logic_space.height / 2);
-
-
-	/* set the game variables */
-
+	player->setInitialPosition(logic_space.width / 2, logic_space.height / 2);
 
 }
 
@@ -140,6 +138,8 @@ void Scene2D::FrameStart()
 void Scene2D::Update(float deltaTimeSeconds)
 {
 	bool end_game = game_instance->isEndGame();
+
+	game_instance->updateTimers(deltaTimeSeconds);
 
 	time_elapsed += deltaTimeSeconds;
 
@@ -210,19 +210,23 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 	
 	/* render the player's ship */
 
-	player_ship->computeModelMatrix(vis_matrix);
+	player->computeModelMatrix(vis_matrix);
 
-	RenderMesh2D(meshes["ship"],shaders["VertexColor"],player_ship->getModelMatrix());
+	RenderMesh2D(meshes["ship"],shaders["VertexColor"],player->getModelMatrix());
 	
 
 	/* Render projectiles and check for enemy-projectile collision */
 	for (auto proj : projectiles) {
 
-		float dtx = proj->x_speed * 24 * deltaTimeSeconds;
-		float dty = proj->y_speed * 24 * deltaTimeSeconds;
+		float cuantif = 24 * deltaTimeSeconds;
+		proj->updatePosition(24 * deltaTimeSeconds);
 
-		proj->tx += dtx;
-		proj->ty += dty;
+		if (proj->tx < 0 || proj->tx > LOGIC_WINDOW_WIDTH) {
+			proj->should_render = false;
+		}
+		if (proj->ty < 0 || proj->ty > LOGIC_WINDOW_HEIGHT) {
+			proj->should_render = false;
+		}
 
 		proj->computeModelMatrix(vis_matrix);
 
@@ -241,7 +245,6 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 					}
 					if (enemy->lives_left == 2) {
 						enemy->shrink = true;
-						enemy->mesh = meshes["shrinked_enemy_ship"];
 						enemy->lives_left = 1;
 						break;
 					}
@@ -256,11 +259,10 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 	/* Render enemies and check for enemy-player collision */
 	for (auto enemy : enemies) {
 		
-		glm::vec2 player_pos = glm::vec2(player_ship->tx, player_ship->ty);
+		glm::vec2 player_pos = glm::vec2(player->tx, player->ty);
 		enemy->setMoveDirection(player_pos);
 
 		if (enemy->shrink) { /* if the enemy is strong and has been hit, the speed doubles */
-			enemy->mesh = meshes["shrinked_enemy_ship"];
 			enemy->mesh_name = "shrinked_enemy_ship";
 			enemy->x_speed *= 2;
 			enemy->y_speed *= 2;
@@ -270,25 +272,21 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 		}
 
 		if (!freeze_enemies) {
-			float delta_tx = enemy->x_speed * deltaTimeSeconds;
-			float delta_ty = enemy->y_speed * deltaTimeSeconds;
+			enemy->updatePosition(deltaTimeSeconds);
 			
-			enemy->tx += delta_tx;
-			enemy->ty += delta_ty;
-
 			enemy->computeModelMatrix(vis_matrix);
 		}
 
 		
-		if (player_ship->collidesWith(enemy) && enemy->should_render)
+		if (player->collidesWith(enemy) && enemy->should_render)
 		{
-			if (player_ship->lives_left == 1)	{
+			if (player->lives_left == 1)	{
 				game_instance->OnGameEnd();
 				enemy->should_render = false;
-				player_ship->lives_left--;
+				player->lives_left--;
 			}
-			else if (player_ship->lives_left > 1) {
-				player_ship->lives_left--;
+			else if (player->lives_left > 1) {
+				player->lives_left--;
 				enemy->should_render = false;
 			}
 		}
@@ -300,12 +298,10 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 	for (auto powerup : powerups) {
 
 		powerup->computeModelMatrix(vis_matrix);
-		//powerup->model_matrix = vis_matrix;
-		//powerup->model_matrix *= Transform2D::Translate(powerup->tx, powerup->ty);
 
-		if (player_ship->collidesWith(powerup) && powerup->should_render) {
+		if (player->collidesWith(powerup) && powerup->should_render) {
 			if (powerup->mesh_name == "life") {
-				player_ship->lives_left++;
+				player->lives_left++;
 			}
 			else if (powerup->mesh_name == "freeze") {
 				freeze_enemies = true;
@@ -319,7 +315,7 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 
 	float tx = 16.0f;
 	float ty = 8.5f;
-	for (int i = 0; i < player_ship->lives_left; i++) {
+	for (int i = 0; i < player->lives_left; i++) {
 		tx -= (LIVES_SIZE + 0.1f);
 		glm::mat3 model_matrix = vis_matrix;
 		model_matrix *= Transform2D::Translate(tx, ty);
@@ -329,27 +325,33 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 
 void Scene2D::OnInputUpdate(float deltaTime, int mods)
 {
-	if (window->KeyHold(GLFW_KEY_W)) {
-		player_ship->ty += 3 * deltaTime;
+	float x_cuantif = 0.0f;
+	float y_cuantif = 0.0f;
+
+	if (window->KeyHold(GLFW_KEY_W) || window->KeyHold(GLFW_KEY_UP)) {
+		y_cuantif += 3 * deltaTime;
 	}
-	else if (window->KeyHold(GLFW_KEY_S)) {
-		player_ship->ty -= 3 * deltaTime;
+	else if (window->KeyHold(GLFW_KEY_S) || window->KeyHold(GLFW_KEY_DOWN)) {
+		y_cuantif -= 3 * deltaTime;
 	}
-	if (window->KeyHold(GLFW_KEY_A)) {
-		player_ship->tx -= 3 * deltaTime;
+	if (window->KeyHold(GLFW_KEY_A) || window->KeyHold(GLFW_KEY_LEFT)) {
+		x_cuantif += -3 * deltaTime;
 	}
-	else if (window->KeyHold(GLFW_KEY_D)) {
-		player_ship->tx += 3 * deltaTime;
+	else if (window->KeyHold(GLFW_KEY_D) || window->KeyHold(GLFW_KEY_RIGHT)) {
+		x_cuantif += 3 * deltaTime;
 	}
 	else if (window->KeyHold(GLFW_KEY_V)) {
 		spawnPowerup(); // only for testing purposes
 	}
+
+	player->updatePosition(x_cuantif, y_cuantif);
+
 	glm::ivec2 mouse_pos = window->GetCursorPosition();
 	float logic_mouse_x = ((float)(mouse_pos.x)) / 80;
 	float logic_mouse_y = ((float)(window->GetResolution().y - mouse_pos.y)) / 80;
-	float x_diff = logic_mouse_x - player_ship->tx;
-	float y_diff = logic_mouse_y - player_ship->ty;
-	player_ship->rotation = atan(y_diff / x_diff);
+	float x_diff = logic_mouse_x - player->tx;
+	float y_diff = logic_mouse_y - player->ty;
+	player->rotation = atan(y_diff / x_diff);
 }
 
 
@@ -359,23 +361,15 @@ void Scene2D::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 {
 	if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_LEFT)) {
 		
-		GameObject* projectile = new GameObject();
-		projectile->setCenter(origin);
-		projectile->setMeshInfo(meshes["projectile"], "projectile");
-		projectile->setSize(PROJECTILE_SIZE);
-		projectile->setColor(yellow);
-
-		projectile->tx = player_ship->tx;
-		projectile->ty = player_ship->ty;
+		Projectile* projectile = new Projectile();
+		projectile->setInitialPosition(player->tx, player->ty);
 
 		float logic_mouse_x = ((float)(mouseX)) / 80;
 		float logic_mouse_y = ((float)(window->GetResolution().y - mouseY)) / 80;
 		glm::vec2 mouse_pos = glm::vec2(logic_mouse_x, logic_mouse_y);
 		
-		
 		projectile->setMoveDirection(mouse_pos);
 	
-
 		projectiles.push_back(projectile);
 	}
 
@@ -388,42 +382,28 @@ void Scene2D::spawnEnemies() {
 
 
 			float angle = (float)rand();
-			float px = player_ship->tx;
-			float py = player_ship->ty;
+			float px = player->tx;
+			float py = player->ty;
+
 			float radius = ENEMY_SPAWN_DISTANCE;
+
 			float x = cos(angle)*radius;
 			float y = sin(angle)*radius;
 
 
-			GameObject* enemy;
+			Enemy* enemy;
 
 			int lives_count = (rand() % 2) + 1;
-			glm::vec3 color;
-			std::string mesh_name;
 
-			if (lives_count == 1) {
-				mesh_name = "weak_enemy_ship";
-				color = deepskyblue;
-			}
-			else {
-				mesh_name = "strong_enemy_ship";
-				color = gold;
-			}
-			enemy = new GameObject();
+			enemy = new Enemy(lives_count);
 			enemy->setCenter(origin);
-			enemy->setMeshInfo(meshes[mesh_name], mesh_name);
-			enemy->setSize(DEFAULT_ENEMY_SIZE);
-			enemy->setColor(color);
 
-			enemy->initial_lives = lives_count;
-			enemy->lives_left = enemy->initial_lives;
+			enemy->setInitialPosition(px + x, py + y);
 
-			enemy->tx = px + x;
-			enemy->ty = py + y;
-
-			glm::vec2 player_pos = glm::vec2(player_ship->tx, player_ship->ty);
+			glm::vec2 player_pos = glm::vec2(player->tx, player->ty);
 			enemy->setMoveDirection(player_pos);
 			float speedCuantifier = (float)(rand() % 3 + 1);
+
 			enemy->x_speed *= speedCuantifier;
 			enemy->y_speed *= speedCuantifier;
 
@@ -433,13 +413,13 @@ void Scene2D::spawnEnemies() {
 }
 
 void Scene2D::eraseInvisibleEntities() {
-	std::vector<GameObject*>::iterator projectile;
+	std::list<Projectile*>::iterator projectile;
 	for (projectile = std::begin(projectiles); projectile != std::end(projectiles); ++projectile) {
 		if (!(*projectile)->should_render)
 			projectiles.erase(projectile);
 	}
-	std::vector<GameObject*>::iterator enemy;
-	for (projectile = std::begin(enemies); projectile != std::end(enemies); ++enemy) {
+	std::list<Enemy*>::iterator enemy;
+	for (enemy = std::begin(enemies); enemy != std::end(enemies); ++enemy) {
 		if (!(*enemy)->should_render)
 			enemies.erase(enemy);
 	}
@@ -448,7 +428,8 @@ void Scene2D::eraseInvisibleEntities() {
 void Scene2D::freezeScreen(glm::mat3 vis_matrix) {
 
 	/*render player*/
-	RenderMesh2D(meshes["ship"],shaders["VertexColor"],player_ship->model_matrix);
+	RenderMesh2D(meshes["ship"],shaders["VertexColor"],player->model_matrix);
+
 	/*render enemies*/
 	for (auto enemy : enemies) {
 		if (enemy->should_render)
@@ -460,15 +441,15 @@ void Scene2D::freezeScreen(glm::mat3 vis_matrix) {
 	}
 	/* render powerups */
 	for (auto powerup : powerups) {
-		powerup->model_matrix = vis_matrix;
-		powerup->model_matrix *= Transform2D::Translate(powerup->tx, powerup->ty);
+		powerup->computeModelMatrix(vis_matrix);
+
 		if (powerup->should_render)
 			RenderMesh2D(meshes[powerup->getMeshName()] , shaders["VertexColor"], powerup->model_matrix);
 	}
 	/*render projectiles*/
 	float tx = 16.0f;
 	float ty = 8.5f;
-	for (int i = 0; i < player_ship->lives_left; i++) {
+	for (int i = 0; i < player->lives_left; i++) {
 		tx -= (LIVES_SIZE + 0.1f);
 		glm::mat3 model_matrix = vis_matrix;
 		model_matrix *= Transform2D::Translate(tx, ty);
@@ -479,18 +460,15 @@ void Scene2D::freezeScreen(glm::mat3 vis_matrix) {
 void Scene2D::spawnPowerup() {
 
 	int powerup_type = (rand() % 2 + 1);
-	float x_pos = (float)(rand() % 16);
-	float y_pos = (float)(rand() % 9);
+	float x_pos = (float)(rand() % LOGIC_WINDOW_WIDTH);
+	float y_pos = (float)(rand() % LOGIC_WINDOW_HEIGHT);
 
 	Powerup* powerup = new Powerup(powerup_type);
-
 
 	powerup->setCenter(origin);
 	powerup->setInitialPosition(x_pos, y_pos);
 
-
 	powerups.push_back(powerup);
-
 
 }
 

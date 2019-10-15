@@ -7,10 +7,10 @@
 
 class Enemy : public GameObject {
 public:
-	Enemy();
+	Enemy(int enemy_type);
 	~Enemy();
 
-	void takeDamage(int damage);
+	void updatePosition(float speed_cuantif);
 
 private:
 

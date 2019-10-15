@@ -2,7 +2,6 @@
 #include "Transform2D.h"
 
 GameObject::GameObject() {
-	mesh = nullptr;
 	this->mesh_name = "";
 	this->center = glm::vec3();
 	this->size = 0.0f;
@@ -42,9 +41,8 @@ void GameObject::setMoveDirection(glm::vec2 target) {
 	rotation = atan(dy / dx);
 }
 
-void GameObject::setMeshInfo(Mesh* m, std::string mesh_name)
+void GameObject::setMeshInfo(std::string mesh_name)
 {
-	this->mesh = m;
 	this->mesh_name = mesh_name;
 }
 

@@ -5,11 +5,14 @@
 
 #include <Component/SimpleScene.h>
 #include <string>
+#include <list>
 #include <Core/Engine.h>
 
 #include "GameObject.h"
 #include "Player.h"
 #include "Powerup.h"
+#include "Projectile.h"
+#include "Enemy.h"
 #include "GameInstance.h"
 
 
@@ -77,10 +80,10 @@ class Scene2D : public SimpleScene
 		glm::mat3 vis_matrix;
 		glm::vec3 background_color;
 
-		Player* player_ship;
-		std::vector<GameObject*> enemies;
-		std::vector<GameObject*> projectiles;
-		std::vector<Powerup*> powerups;
+		Player* player;
+		std::list<Enemy*> enemies;
+		std::list<Projectile*> projectiles;
+		std::list<Powerup*> powerups;
 
 		GameInstance* game_instance;
 

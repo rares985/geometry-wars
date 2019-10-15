@@ -11,6 +11,8 @@ public:
 	Player();
 	~Player();
 
+	void updatePosition(float x_cuantif, float y_cuantif);
+
 
 private:
 
