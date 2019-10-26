@@ -10,18 +10,18 @@ public:
 	Enemy(int enemy_type);
 	~Enemy();
 
-	void updatePosition(float speed_cuantif);
+	void	updatePosition(float speed_cuantif);
 
-	void collideWith(Enemy& enemy) override;
-	void collideWith(Projectile& projectile) override;
-	void collideWith(Powerup& powerup) override;
-	void collideWith(Player& player) override;
+	void	collideWith(Enemy& enemy) override;
+	void	collideWith(Projectile& projectile) override;
+	void	collideWith(Powerup& powerup) override;
+	void	collideWith(Player& player) override;
 
-	void performShrink(float deltaTimeSeconds);
+	void	performShrink(float deltaTimeSeconds);
 
 private:
 
-	void takeDamage(int damage);
+	void	takeDamage(int damage);
 
 
 

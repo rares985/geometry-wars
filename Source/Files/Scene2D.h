@@ -65,11 +65,7 @@ class Scene2D : public SimpleScene
 
 		void SetViewportArea(const ViewportSpace &viewSpace, glm::vec3 colorColor = glm::vec3(0), bool clear = true);
 
-		void spawnEnemies();
-
 		void freezeScreen(glm::mat3 visMatrix);
-
-		void spawnPowerup();
 
 	protected:
 		ViewportSpace view_space;
@@ -77,10 +73,10 @@ class Scene2D : public SimpleScene
 		glm::mat3 vis_matrix;
 		glm::vec3 background_color;
 
-		Player* player;
-		std::list<Enemy*> enemies;
-		std::list<Projectile*> projectiles;
-		std::list<Powerup*> powerups;
+		//Player* player;
+		//std::list<Enemy*> enemies;
+		//std::list<Projectile*> projectiles;
+		//std::list<Powerup*> powerups;
 
 		GameInstance* game_instance;
 

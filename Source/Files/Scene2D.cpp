@@ -18,6 +18,7 @@ using namespace std;
 Scene2D::Scene2D()
 {
 	game_instance = new GameInstance();
+
 	freeze_enemies = false;
 
 	powerup_spawn_threshold = 0;
@@ -40,25 +41,20 @@ Scene2D::Scene2D()
 
 	background_color = black;
 
-	player = new Player();
+	//player = new Player();
 }
 
 Scene2D::~Scene2D()
 {
-	delete player;
-	for (auto obj : projectiles) {
-		delete obj;
-	}
-	for (auto obj : enemies) {
-		delete obj;
-	}
-	for (auto obj : powerups) {
-		delete obj;
-	}
+	//delete player;
+	delete game_instance;
 }
 
 void Scene2D::Init()
 {
+
+	Player& player = *(game_instance->player);
+
 	/* Fix the camera so we can ignore the Z axis */
 	auto camera = GetSceneCamera();
 	camera->SetPosition(glm::vec3(0, 0, 50));
@@ -87,7 +83,7 @@ void Scene2D::Init()
 	AddMeshToList(life_powerup_mesh);
 	AddMeshToList(freeze_powerup_mesh);
 
-	player->setInitialPosition(logic_space.width / 2, logic_space.height / 2);
+	player.setInitialPosition(logic_space.width / 2, logic_space.height / 2);
 
 }
 
@@ -135,45 +131,11 @@ void Scene2D::FrameStart()
 
 }
 
-void Scene2D::Update(float deltaTimeSeconds)
-{
+void Scene2D::Update(float deltaTimeSeconds) {
+
 	bool end_game = game_instance->isEndGame();
 
 	game_instance->updateTimers(deltaTimeSeconds);
-
-	time_elapsed += deltaTimeSeconds;
-
-	/* Timers should update only when enemies are not frozen */
-	if (!freeze_enemies && !end_game) {
-		enemy_spawn_timer += deltaTimeSeconds;
-		powerup_spawn_timer += deltaTimeSeconds;
-	}
-
-	/* The spawn threshold decreases per frame, from 2s to 0.5s */
-	if (enemy_spawn_threshold > MIN_SPAWN_TIME && !freeze_enemies && !end_game) {
-		enemy_spawn_threshold -= (deltaTimeSeconds / 100);
-	}
-	else if (enemy_spawn_threshold < MIN_SPAWN_TIME && !end_game) {
-		enemy_spawn_threshold = MIN_SPAWN_TIME;
-	}
-
-	/* Enemies spawn every spawn_threshold seconds*/
-	if (enemy_spawn_timer > enemy_spawn_threshold && !end_game) {
-		spawnEnemies();
-		enemy_spawn_timer = 0;
-	}
-
-	/* Powerups spawn every 10 seconds */
-	if (powerup_spawn_timer > POWERUP_SPAWN_THRESHOLD && !freeze_enemies && !end_game) {
-		powerup_spawn_timer = 0;
-		spawnPowerup();
-	}
-
-	/* If freeze is over, reset the timer */
-	if (freeze_timer > FREEZE_DURATION) {
-		freeze_enemies = false;
-		freeze_timer = 0;
-	}
 	
 	/* If game has ended , the background color fades to red */
 	if (end_game)
@@ -202,10 +164,14 @@ void Scene2D::Update(float deltaTimeSeconds)
 
 void Scene2D::FrameEnd()
 {
+	Player &player = *(game_instance->player);
+	std::list<Projectile*>& projectiles = game_instance->projectiles;
+	std::list<Enemy*>& enemies = game_instance->enemies;
+	std::list<Powerup*>& powerups = game_instance->powerups;
+
 	glm::vec2 low(0, 0);
 	glm::vec2 high(LOGIC_WINDOW_WIDTH, LOGIC_WINDOW_HEIGHT);
 	glm::vec2 pos;
-
 
 	for (auto proj : projectiles) {
 		pos = proj->getPosition();
@@ -218,21 +184,21 @@ void Scene2D::FrameEnd()
 	enemies.remove_if([](const Enemy* enemy) {return !enemy->isVisible(); });
 	powerups.remove_if([](const Powerup* powerup) {return !powerup->isVisible(); });
 
-	std::cout << "Projectiles Size: " << projectiles.size() << std::endl;
-	std::cout << "Enemies Size: " << enemies.size() << std::endl;
-	std::cout << "Powerups Size: " << powerups.size() << std::endl;
-
-	if (player->isDead()) {
+	if (player.isDead()) {
 		game_instance->OnGameEnd();
 	}
 }
 
 void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 {
+	Player& player = *(game_instance->player);
+	std::list<Projectile*>& projectiles = game_instance->projectiles;
+	std::list<Enemy*>& enemies = game_instance->enemies;
+	std::list<Powerup*>& powerups = game_instance->powerups;
 	
 	/* render the player's ship */
-	player->computeModelMatrix(vis_matrix);
-	RenderMesh2D(meshes["ship"],shaders["VertexColor"],player->getModelMatrix());
+	player.computeModelMatrix(vis_matrix);
+	RenderMesh2D(meshes["ship"],shaders["VertexColor"],player.getModelMatrix());
 	
 
 	/* Render projectiles and check for enemy-projectile collision */
@@ -258,7 +224,7 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 	for (auto enemy : enemies) {
 		
 		/* Make the enemy move towards the player */
-		enemy->moveTowards(player->getPosition());
+		enemy->moveTowards(player.getPosition());
 
 		if (enemy->shrink) { /* if the enemy is strong and has been hit, the speed doubles */
 			enemy->performShrink(deltaTimeSeconds);
@@ -270,8 +236,8 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 			enemy->computeModelMatrix(vis_matrix);
 		}
 
-		if (player->collidesWith(enemy)) {
-			player->collideWith(*enemy);
+		if (player.collidesWith(enemy)) {
+			player.collideWith(*enemy);
 		}
 
 		if (enemy->isVisible()) {
@@ -283,8 +249,8 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 
 		powerup->computeModelMatrix(vis_matrix);
 
-		if (player->collidesWith(powerup)) {
-			player->collideWith(*powerup);
+		if (player.collidesWith(powerup)) {
+			player.collideWith(*powerup);
 			if (powerup->getMeshName() == "freeze") {
 				freeze_enemies = true;
 				freeze_timer = 0;
@@ -296,7 +262,7 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 
 	float tx = 16.0f;
 	float ty = 8.5f;
-	for (int i = 0; i < player->lives_left; i++) {
+	for (int i = 0; i < player.lives_left; i++) {
 		tx -= (LIVES_SIZE + 0.1f);
 		glm::mat3 model_matrix = vis_matrix;
 		model_matrix *= Transform2D::Translate(tx, ty);
@@ -304,8 +270,10 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 	}
 }
 
-void Scene2D::OnInputUpdate(float deltaTime, int mods)
-{
+void Scene2D::OnInputUpdate(float deltaTime, int mods) {
+
+	Player& player = *(game_instance->player);
+
 	float x_cuantif = 0.0f;
 	float y_cuantif = 0.0f;
 
@@ -322,10 +290,10 @@ void Scene2D::OnInputUpdate(float deltaTime, int mods)
 		x_cuantif += 3 * deltaTime;
 	}
 	else if (window->KeyHold(GLFW_KEY_V)) {
-		spawnPowerup(); // only for testing purposes
+		game_instance->spawnPowerup(); // only for testing purposes
 	}
 
-	player->updatePosition(x_cuantif, y_cuantif);
+	player.updatePosition(x_cuantif, y_cuantif);
 
 
 	glm::ivec2 mouse_pos = window->GetCursorPosition();
@@ -333,14 +301,16 @@ void Scene2D::OnInputUpdate(float deltaTime, int mods)
 	float logic_mouse_x = (float)(mouse_pos.x) / LOGIC_SCALE_FACTOR;
 	float logic_mouse_y = (float)(WINDOW_HEIGHT_PX - mouse_pos.y) / LOGIC_SCALE_FACTOR;
 
-	player->rotateTowards(glm::vec2(logic_mouse_x, logic_mouse_y));
+	player.rotateTowards(glm::vec2(logic_mouse_x, logic_mouse_y));
 }
 
 
 
 
-void Scene2D::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
-{
+void Scene2D::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods) {
+	Player& player = *(game_instance->player);
+	std::list<Projectile*>& projectiles = game_instance->projectiles;
+
 	if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_LEFT)) {
 		
 		Projectile* projectile = new Projectile();
@@ -349,7 +319,7 @@ void Scene2D::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 		float logic_mouse_y = (float)(WINDOW_HEIGHT_PX - mouseY) / LOGIC_SCALE_FACTOR;
 
 	
-		projectile->setInitialPosition(player->getPosition());
+		projectile->setInitialPosition(player.getPosition());
 		projectile->moveTowards(glm::vec2(logic_mouse_x, logic_mouse_y));
 	
 		projectiles.push_back(projectile);
@@ -357,36 +327,15 @@ void Scene2D::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 }
 
 
-void Scene2D::spawnEnemies() {
-
-	for (int i = 0; i < ENEMIES_SPAWNED_PER_ROUND; i++) {
-
-		float angle = (float)rand();
-		glm::vec2 player_pos = player->getPosition();
-		glm::vec2 polar_pos(cos(angle), sin(angle));
-
-		/* Convert from angle to distance */
-		polar_pos *= ENEMY_SPAWN_DISTANCE;
-
-		int enemy_type = (rand() % 2) + 1;
-		Enemy* enemy = new Enemy(enemy_type);
-
-		enemy->setInitialPosition(player_pos + polar_pos);
-		enemy->moveTowards(player_pos);
-
-		float speedCuantifier = (float)(rand() % 3 + 1);
-
-		enemy->x_speed *= speedCuantifier;
-		enemy->y_speed *= speedCuantifier;
-
-		enemies.push_back(enemy);
-	}
-}
-
 void Scene2D::freezeScreen(glm::mat3 vis_matrix) {
 
+	Player& player = *(game_instance->player);
+	std::list<Projectile*>& projectiles = game_instance->projectiles;
+	std::list<Enemy*>& enemies = game_instance->enemies;
+	std::list<Powerup*>& powerups = game_instance->powerups;
+
 	/*render player*/
-	RenderMesh2D(meshes["ship"],shaders["VertexColor"],player->getModelMatrix());
+	RenderMesh2D(meshes["ship"],shaders["VertexColor"],player.getModelMatrix());
 
 	/*render enemies*/
 	for (auto enemy : enemies) {
@@ -407,30 +356,11 @@ void Scene2D::freezeScreen(glm::mat3 vis_matrix) {
 	/*render projectiles*/
 	float tx = 16.0f;
 	float ty = 8.5f;
-	for (int i = 0; i < player->lives_left; i++) {
+	for (int i = 0; i < player.lives_left; i++) {
 		tx -= (LIVES_SIZE + 0.1f);
 		glm::mat3 model_matrix = vis_matrix;
 		model_matrix *= Transform2D::Translate(tx, ty);
 		RenderMesh2D(meshes["lives"], shaders["VertexColor"], model_matrix);
 	}
 }
-
-void Scene2D::spawnPowerup() {
-
-	int powerup_type = (rand() % 2 + 1);
-
-	float x_pos = (float)(rand() % LOGIC_WINDOW_WIDTH);
-	float y_pos = (float)(rand() % LOGIC_WINDOW_HEIGHT);
-
-	Powerup* powerup = new Powerup(powerup_type);
-
-	powerup->setCenter(origin);
-	powerup->setInitialPosition(x_pos, y_pos);
-
-	powerups.push_back(powerup);
-
-}
-
-
-
 

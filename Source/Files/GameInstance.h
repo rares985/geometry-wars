@@ -34,6 +34,11 @@ public:
 
 	void spawnPowerup();
 
+	std::list<Enemy*> enemies;
+	std::list<Projectile*> projectiles;
+	std::list<Powerup*> powerups;
+	Player* player;
+
 private:
 	long long int score;
 	bool end_game;
@@ -48,10 +53,7 @@ private:
 
 	GameState game_state;
 
-	Player* player;
-	std::list<Enemy*> enemies;
-	std::list<Projectile*> projectiles;
-	std::list<Powerup*> powerups;
+
 
 
 };
