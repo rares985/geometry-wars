@@ -21,3 +21,19 @@ Powerup::Powerup(int type) {
 Powerup::~Powerup() {
 
 }
+
+void Powerup::collideWith(Enemy& enemy)
+{
+}
+
+void Powerup::collideWith(Projectile& enemy)
+{
+}
+
+void Powerup::collideWith(Powerup& enemy)
+{
+}
+
+void Powerup::collideWith(Player& player)
+{
+}

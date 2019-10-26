@@ -1,5 +1,8 @@
 #include "Enemy.h"
 #include "constants.h"
+#include "Player.h"
+
+class Player;
 
 Enemy::Enemy(int enemy_type) {
 	if (enemy_type == 1) {
@@ -23,4 +26,20 @@ void Enemy::updatePosition(float speed_cuantif)
 {
 	this->tx += this->x_speed * speed_cuantif;
 	this->ty += this->y_speed * speed_cuantif;
+}
+
+void Enemy::collideWith(Enemy& enemy)
+{
+}
+
+void Enemy::collideWith(Projectile& enemy)
+{
+}
+
+void Enemy::collideWith(Powerup& enemy)
+{
+}
+
+void Enemy::collideWith(Player& player)
+{
 }

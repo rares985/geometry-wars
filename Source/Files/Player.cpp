@@ -25,3 +25,19 @@ void Player::updatePosition(float x_cuantif, float y_cuantif)
 	this->tx += x_cuantif;
 	this->ty += y_cuantif;
 }
+
+void Player::collideWith(Enemy& enemy)
+{
+}
+
+void Player::collideWith(Projectile& enemy)
+{
+}
+
+void Player::collideWith(Powerup& enemy)
+{
+}
+
+void Player::collideWith(Player& player) {
+
+}

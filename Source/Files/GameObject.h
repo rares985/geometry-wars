@@ -5,6 +5,11 @@
 
 #include<Core/Engine.h>
 
+class Player;
+class Projectile;
+class Powerup;
+class Enemy;
+
 class GameObject {
 
 	public:
@@ -29,6 +34,11 @@ class GameObject {
 		glm::mat3 getModelMatrix();
 
 		bool collidesWith(GameObject* other);
+
+		virtual void collideWith(Player& player) = 0;
+		virtual void collideWith(Projectile& projectile) = 0;
+		virtual void collideWith(Enemy& enemy) = 0;
+		virtual void collideWith(Powerup& powerup) = 0;
 
 		glm::vec3 center;
 		
