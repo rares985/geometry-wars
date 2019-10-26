@@ -2,6 +2,8 @@
 
 #include "Player.h"
 #include "constants.h"
+#include "Enemy.h"
+#include "Powerup.h"
 
 
 Player::Player() {
@@ -16,28 +18,40 @@ Player::Player() {
 	this->initial_lives = 3;
 }
 
-Player::~Player()
-{
+Player::~Player() {
+	// deconstruct player class... 
 }
 
-void Player::updatePosition(float x_cuantif, float y_cuantif)
-{
+void Player::updatePosition(float x_cuantif, float y_cuantif) {
 	this->tx += x_cuantif;
 	this->ty += y_cuantif;
 }
 
-void Player::collideWith(Enemy& enemy)
-{
+void Player::collideWith(Enemy& enemy) {
+	/* Notify enemy that it collided with us, it will take damage */
+	enemy.collideWith(*this);
+
+	/* take Damage */
+	this->takeDamage(enemy.getLivesLeft());
 }
 
-void Player::collideWith(Projectile& enemy)
-{
+void Player::collideWith(Projectile& enemy) {
+	// no collision possible between player and projectile...
 }
 
-void Player::collideWith(Powerup& enemy)
-{
+void Player::collideWith(Powerup& powerup) {
+	/* Notify powerup that it collided with us...will apply an efect */
+	powerup.collideWith(*this);
+
 }
 
 void Player::collideWith(Player& player) {
+	// No collision possible between two players ...
+}
 
+void Player::takeDamage(int damage) {
+	this->lives_left -= damage;
+	if (this->lives_left <= 0) {
+		this->visible = 0;
+	}
 }

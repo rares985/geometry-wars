@@ -1,8 +1,7 @@
 #include "Enemy.h"
 #include "constants.h"
 #include "Player.h"
-
-class Player;
+#include "Projectile.h"
 
 Enemy::Enemy(int enemy_type) {
 	if (enemy_type == 1) {
@@ -30,16 +29,36 @@ void Enemy::updatePosition(float speed_cuantif)
 
 void Enemy::collideWith(Enemy& enemy)
 {
+	// No collision possible between enemies...
 }
 
-void Enemy::collideWith(Projectile& enemy)
+void Enemy::collideWith(Projectile& projectile)
 {
+	/* notify projectile that it collided with us */
+	projectile.collideWith(*this);
+
+	/* take damage */
+	this->takeDamage(1);
 }
 
-void Enemy::collideWith(Powerup& enemy)
+void Enemy::collideWith(Powerup& powerup)
 {
+	// No collision possible between enemy and powerup...
 }
 
 void Enemy::collideWith(Player& player)
 {
+	/* notified by player, only take damage */
+
+	/* Die */
+	this->takeDamage(this->lives_left);
+}
+
+void Enemy::takeDamage(int damage)
+{
+	this->lives_left -= damage;
+
+	if (this->lives_left < 0) {
+		this->visible = false;
+	}
 }

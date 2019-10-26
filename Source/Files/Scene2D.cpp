@@ -219,13 +219,13 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 	for (auto proj : projectiles) {
 
 		float cuantif = 24 * deltaTimeSeconds;
-		proj->updatePosition(24 * deltaTimeSeconds);
+		proj->updatePosition(cuantif);
 
 		if (proj->tx < 0 || proj->tx > LOGIC_WINDOW_WIDTH) {
-			proj->should_render = false;
+			proj->visible = false;
 		}
 		if (proj->ty < 0 || proj->ty > LOGIC_WINDOW_HEIGHT) {
-			proj->should_render = false;
+			proj->visible = false;
 		}
 
 		proj->computeModelMatrix(vis_matrix);
@@ -233,12 +233,12 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 		/* check for enemy-projectile collision */
 		for (auto enemy : enemies) {
 
-			if (proj->should_render && enemy->should_render) { /* if objects are visible(if they can collide) */
+			if (proj->visible && enemy->visible) { /* if objects are visible(if they can collide) */
 				if (enemy->collidesWith(proj)) {
-					proj->should_render = false;
+					proj->visible = false;
 
 					if (enemy->lives_left == 1) {
-						enemy->should_render = false;
+						enemy->visible = false;
 						enemy->lives_left = 0;
 						game_instance->updateScore(enemy->initial_lives);
 						break; /* one projectile can damage 1 enemy only */
@@ -251,7 +251,7 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 				}
 			}
 		}
-		if (proj->should_render == true)
+		if (proj->visible == true)
 			RenderMesh2D(meshes[proj->getMeshName()], shaders["VertexColor"], proj->getModelMatrix());
 	}
 
@@ -278,20 +278,20 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 		}
 
 		
-		if (player->collidesWith(enemy) && enemy->should_render)
+		if (player->collidesWith(enemy) && enemy->visible)
 		{
 			if (player->lives_left == 1)	{
 				game_instance->OnGameEnd();
-				enemy->should_render = false;
+				enemy->visible = false;
 				player->lives_left--;
 			}
 			else if (player->lives_left > 1) {
 				player->lives_left--;
-				enemy->should_render = false;
+				enemy->visible = false;
 			}
 		}
 
-		if (enemy->should_render)
+		if (enemy->visible)
 				RenderMesh2D(meshes[enemy->getMeshName()], shaders["VertexColor"], enemy->model_matrix);
 	}
 
@@ -299,7 +299,7 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 
 		powerup->computeModelMatrix(vis_matrix);
 
-		if (player->collidesWith(powerup) && powerup->should_render) {
+		if (player->collidesWith(powerup) && powerup->visible) {
 			if (powerup->mesh_name == "life") {
 				player->lives_left++;
 			}
@@ -307,9 +307,9 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 				freeze_enemies = true;
 				freeze_timer = 0;
 			}
-			powerup->should_render = false;
+			powerup->visible = false;
 		}
-		if (powerup->should_render)
+		if (powerup->visible)
 			RenderMesh2D(meshes[powerup->getMeshName()], shaders["VertexColor"], powerup->model_matrix);
 	}
 
@@ -415,12 +415,12 @@ void Scene2D::spawnEnemies() {
 void Scene2D::eraseInvisibleEntities() {
 	std::list<Projectile*>::iterator projectile;
 	for (projectile = std::begin(projectiles); projectile != std::end(projectiles); ++projectile) {
-		if (!(*projectile)->should_render)
+		if (!(*projectile)->visible)
 			projectiles.erase(projectile);
 	}
 	std::list<Enemy*>::iterator enemy;
 	for (enemy = std::begin(enemies); enemy != std::end(enemies); ++enemy) {
-		if (!(*enemy)->should_render)
+		if (!(*enemy)->visible)
 			enemies.erase(enemy);
 	}
 }
@@ -432,18 +432,18 @@ void Scene2D::freezeScreen(glm::mat3 vis_matrix) {
 
 	/*render enemies*/
 	for (auto enemy : enemies) {
-		if (enemy->should_render)
+		if (enemy->visible)
 			RenderMesh2D(meshes[enemy->getMeshName()],shaders["VertexColor"],enemy->model_matrix);
 	}
 	for (auto proj : projectiles) {
-		if (proj->should_render)
+		if (proj->visible)
 			RenderMesh2D(meshes[proj->getMeshName()], shaders["VertexColor"], proj->model_matrix);
 	}
 	/* render powerups */
 	for (auto powerup : powerups) {
 		powerup->computeModelMatrix(vis_matrix);
 
-		if (powerup->should_render)
+		if (powerup->visible)
 			RenderMesh2D(meshes[powerup->getMeshName()] , shaders["VertexColor"], powerup->model_matrix);
 	}
 	/*render projectiles*/

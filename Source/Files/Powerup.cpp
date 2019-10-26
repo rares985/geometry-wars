@@ -19,21 +19,24 @@ Powerup::Powerup(int type) {
 }
 
 Powerup::~Powerup() {
+	// Deconstruct Powerup object
 
 }
 
 void Powerup::collideWith(Enemy& enemy)
 {
+	// No collision possible between enemies and powerups...
 }
 
-void Powerup::collideWith(Projectile& enemy)
-{
+void Powerup::collideWith(Projectile& projectile) {
+	// No collision possible betwen projectiles and powerups...
 }
 
-void Powerup::collideWith(Powerup& enemy)
-{
+void Powerup::collideWith(Powerup& powerup){
+	// No collision possible between powerups...
 }
 
 void Powerup::collideWith(Player& player)
 {
+	/* Notified by player, apply effect ? */
 }

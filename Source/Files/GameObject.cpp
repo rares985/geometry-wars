@@ -11,7 +11,7 @@ GameObject::GameObject() {
 	model_matrix = glm::mat3(1);
 	tx = ty = 0;
 	x_speed = y_speed = 0;
-	should_render = true;
+	visible = true;
 	shrink = false;
 }
 
@@ -41,60 +41,10 @@ void GameObject::setMoveDirection(glm::vec2 target) {
 	rotation = atan(dy / dx);
 }
 
-void GameObject::setMeshInfo(std::string mesh_name)
-{
-	this->mesh_name = mesh_name;
-}
-
-void GameObject::setColor(glm::vec3 color)
-{
-	this->color = color;
-}
-
-void GameObject::setSize(float size)
-{
-	this->size = size;
-}
-
-void GameObject::setCenter(glm::vec3 center)
-{
-	this->center = center;
-}
-
-void GameObject::setInitialPosition(float tx, float ty)
-{
-	this->tx = tx;
-	this->ty = ty;
-}
-
-std::string GameObject::getMeshName() {
-	return this->mesh_name;
-}
-
 void GameObject::computeModelMatrix(glm::mat3 &vis_matrix)
 {
 	this->model_matrix = vis_matrix;
 	this->model_matrix *= Transform2D::Translate(tx, ty);
 	this->model_matrix *= Transform2D::Rotate(rotation);
 	this->model_matrix *= Transform2D::Scale(this->scale, this->scale);
-}
-
-glm::vec3 GameObject::getColor()
-{
-	return this->color;
-}
-
-float GameObject::getSize()
-{
-	return this->size;
-}
-
-glm::vec3 GameObject::getCenter()
-{
-	return this->center;
-}
-
-glm::mat3 GameObject::getModelMatrix()
-{
-	return this->model_matrix;
 }

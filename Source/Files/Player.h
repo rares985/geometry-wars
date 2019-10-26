@@ -14,12 +14,14 @@ public:
 	void updatePosition(float x_cuantif, float y_cuantif);
 
 	void collideWith(Enemy& enemy) override;
-	void collideWith(Projectile& enemy) override;
-	void collideWith(Powerup& enemy) override;
+	void collideWith(Projectile& projectile) override;
+	void collideWith(Powerup& powerup) override;
 	void collideWith(Player& player) override;
 
 
 private:
+
+	void takeDamage(int damage);
 
 };
 
