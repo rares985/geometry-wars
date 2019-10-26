@@ -6,27 +6,22 @@
 #include "GameObject.h"
 
 class Enemy : public GameObject {
+
 public:
 	Enemy(int enemy_type);
 	~Enemy();
-
-	void	updatePosition(float speed_cuantif);
 
 	void	collideWith(Enemy& enemy) override;
 	void	collideWith(Projectile& projectile) override;
 	void	collideWith(Powerup& powerup) override;
 	void	collideWith(Player& player) override;
 
+	void	updatePosition(float speed_cuantif);
 	void	performShrink(float deltaTimeSeconds);
 
 private:
-
 	void	takeDamage(int damage);
-
-
 
 };
 
-
-
-#endif
+#endif /* ENEMY_H_ */

@@ -17,17 +17,19 @@ class GameObject {
 		GameObject();
 		~GameObject();
 
-		/* Attributes */
 		float		rotation;
 		float		x_speed;
 		float		y_speed;
+
 		int			initial_lives;
 		int			lives_left;
+
 		bool		shrink;
+
 		glm::mat3	model_matrix = glm::mat3();
 
 
-		void moveTowards(glm::vec2 &target);
+		void		moveTowards(glm::vec2 &target);
 
 		void		setSize(float size) { this->size = size; };
 		void		setScale(float scale) { this->scale = scale; };
@@ -61,16 +63,18 @@ class GameObject {
 		virtual void collideWith(Powerup& powerup) = 0;
 
 private:
-	glm::vec3	color;
-	float		size;
+	float			size;
+	glm::vec3		color;
 
 protected:
-	std::string		mesh_name;
-	glm::vec3		center;
 	bool			visible;
+
 	float			tx;
 	float			ty;
 	float			scale;
+
+	std::string		mesh_name;
+	glm::vec3		center;
 
 };
 

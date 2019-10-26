@@ -1,8 +1,9 @@
+#include <iostream>
+
 #include "Enemy.h"
 #include "constants.h"
 #include "Player.h"
 #include "Projectile.h"
-#include <iostream>
 
 Enemy::Enemy(int enemy_type) {
 	if (enemy_type == 1) {

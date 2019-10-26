@@ -17,64 +17,62 @@
 
 
 
-class Scene2D : public SimpleScene
-{
-	public:
-		struct ViewportSpace
-		{
-			ViewportSpace() : x(0), y(0), width(1), height(1) {}
-			ViewportSpace(int x, int y, int width, int height)
-				: x(x), y(y), width(width), height(height) {}
-			int x;
-			int y;
-			int width;
-			int height;
-		};
+class Scene2D : public SimpleScene {
 
-		struct LogicSpace
-		{
-			LogicSpace() : x(0), y(0), width(1), height(1) {}
-			LogicSpace(float x, float y, float width, float height)
-				: x(x), y(y), width(width), height(height) {}
-			float x;
-			float y;
-			float width;
-			float height;
-		};
+public:
+	struct ViewportSpace {
+		ViewportSpace() : x(0), y(0), width(1), height(1) {}
+		ViewportSpace(int x, int y, int width, int height)
+			: x(x), y(y), width(width), height(height) {}
+		int x;
+		int y;
+		int width;
+		int height;
+	};
 
-	public:
-		Scene2D();
-		~Scene2D();
+	struct LogicSpace {
+		LogicSpace() : x(0), y(0), width(1), height(1) {}
+		LogicSpace(float x, float y, float width, float height)
+			: x(x), y(y), width(width), height(height) {}
+		float x;
+		float y;
+		float width;
+		float height;
+	};
 
-		void Init() override;
+public:
+	Scene2D();
+	~Scene2D();
 
-	private:
+	void		Init() override;
 
-		void FrameStart() override;
-		void Update(float deltaTimeSeconds) override;
-		void FrameEnd() override;
+private:
 
-		void DrawScene(glm::mat3 visMatrix,float deltaTimeSeconds);
+	void		FrameStart() override;
+	void		Update(float deltaTimeSeconds) override;
+	void		FrameEnd() override;
 
-		void OnInputUpdate(float deltaTime, int mods) override;
-		
-		void OnMouseBtnPress(int mouseX, int mouseY, int button, int mods) override;
+	void		DrawScene(glm::mat3 visMatrix,float deltaTimeSeconds);
+
+	void		OnInputUpdate(float deltaTime, int mods) override;	
+	void		OnMouseBtnPress(int mouseX, int mouseY, int button, int mods) override;
 	
 		
-		glm::mat3 VisualizationTransf2DUnif(const LogicSpace &logicSpace, const ViewportSpace &viewSpace);
+	glm::mat3	VisualizationTransf2DUnif(const LogicSpace &logicSpace, const ViewportSpace &viewSpace);
+	void		SetViewportArea(const ViewportSpace &viewSpace, glm::vec3 colorColor = glm::vec3(0), bool clear = true);
 
-		void SetViewportArea(const ViewportSpace &viewSpace, glm::vec3 colorColor = glm::vec3(0), bool clear = true);
+	void		freezeScreen(glm::mat3 visMatrix);
 
-		void freezeScreen(glm::mat3 visMatrix);
+protected:
+	
+	glm::mat3		vis_matrix;
+	glm::vec3		background_color;
 
-	protected:
-		ViewportSpace view_space;
-		LogicSpace logic_space;
-		glm::mat3 vis_matrix;
-		glm::vec3 background_color;
+	ViewportSpace	view_space;
 
-		GameInstance* game_instance;
+	LogicSpace		logic_space;
 
+	GameInstance*	game_instance;
 };
 
 #endif /* SCENE_2D_H_ */

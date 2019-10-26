@@ -11,53 +11,52 @@
 #include "Projectile.h"
 
 enum class GameState {
-	GS_NOT_STARTED = 0,
-	GS_RUNNING = 1,
-	GS_FROZEN = 2,
-	GS_ENDED = 3,
-	GS_INVALID = 4
+	GS_NOT_STARTED	= 0,
+	GS_RUNNING		= 1,
+	GS_FROZEN		= 2,
+	GS_ENDED		= 3,
+	GS_INVALID		= 4
 };
 
 class GameInstance {
+
 public:
 	GameInstance();
 	~GameInstance();
 
-	void updateScore(int diff);
-	void updateTimers(float deltaTimeSeconds);
+	void	updateScore(int diff);
+	void	updateTimers(float deltaTimeSeconds);
 
+	void	spawnEnemies();
+	void	spawnPowerup();
 
-	void OnGameEnd(void) { game_state = GameState::GS_ENDED; };
+	void	OnGameEnd(void) { game_state = GameState::GS_ENDED; };
 
-	void spawnEnemies();
+	bool	isFrozen(void) const { return game_state == GameState::GS_FROZEN; };
+	bool	isEndGame(void) const { return game_state == GameState::GS_ENDED; };
+	bool	isRunning(void) const { return game_state == GameState::GS_RUNNING; };
 
-	void spawnPowerup();
+	void	freezeGame(void) { game_state = GameState::GS_FROZEN; };
+	void	unfreezeGame(void) { game_state = GameState::GS_RUNNING; };
 
-	bool isFrozen(void) const { return game_state == GameState::GS_FROZEN; };
-	bool isEndGame(void) const { return game_state == GameState::GS_ENDED; };
-	bool isRunning(void) const { return game_state == GameState::GS_RUNNING; };
+	float						freeze_timer;
 
-	void freezeGame(void) { game_state = GameState::GS_FROZEN; };
-	void unfreezeGame(void) { game_state = GameState::GS_RUNNING; };
+	Player*						player;
 
-
-
-	std::list<Enemy*> enemies;
-	std::list<Projectile*> projectiles;
-	std::list<Powerup*> powerups;
-	Player* player;
-	float freeze_timer;
+	std::list<Enemy*>			enemies;
+	std::list<Projectile*>		projectiles;
+	std::list<Powerup*>			powerups;
 
 private:
-	long long int score;
+	long long int				score;
 
-	float time_elapsed;
-	float enemy_spawn_timer;
-	float enemy_spawn_threshold;
-	float powerup_spawn_timer;
-	float powerup_spawn_threshold;
+	float						time_elapsed;
+	float						enemy_spawn_timer;
+	float						enemy_spawn_threshold;
+	float						powerup_spawn_timer;
+	float						powerup_spawn_threshold;
 
-	GameState game_state;
+	GameState					game_state;
 
 
 

@@ -1,7 +1,6 @@
+#include <iostream>
 #include "GameInstance.h"
 #include "constants.h"
-#include <iostream>
-
 
 GameInstance::GameInstance() {
 	this->score = 0;
