@@ -5,9 +5,8 @@
 
 GameInstance::GameInstance() {
 	this->score = 0;
-	this->end_game = false;
 
-	this->game_state = GameState::GS_NOT_STARTED;
+	this->game_state = GameState::GS_RUNNING;
 
 	this->time_elapsed = 0.0f;
 	this->enemy_spawn_timer = 0.0f;
@@ -16,7 +15,6 @@ GameInstance::GameInstance() {
 	this->powerup_spawn_threshold = 0.0f;
 	this->freeze_timer = 0.0f;
 
-	this->freeze_enemies = false;
 	this->player = new Player();
 
 }
@@ -41,44 +39,36 @@ void GameInstance::updateScore(int diff) {
 
 void GameInstance::updateTimers(float deltaTimeSeconds) {
 
-	if (!freeze_enemies && !end_game) {
+	if (isRunning()) {
 		enemy_spawn_timer += deltaTimeSeconds;
 		powerup_spawn_timer += deltaTimeSeconds;
-	}
 
-	/* The spawn threshold decreases per frame, from 2s to 0.5s */
-	if (enemy_spawn_threshold > MIN_SPAWN_TIME && !freeze_enemies && !end_game) {
-		enemy_spawn_threshold -= (deltaTimeSeconds / 100);
-	}
-	else if (enemy_spawn_threshold < MIN_SPAWN_TIME && !end_game) {
-		enemy_spawn_threshold = MIN_SPAWN_TIME;
-	}
+		/* The spawn threshold decreases per frame, from 2s to 0.5s */
+		if (enemy_spawn_threshold > MIN_SPAWN_TIME) {
+			enemy_spawn_threshold -= (deltaTimeSeconds / 100);
+		}
+		else if (enemy_spawn_threshold < MIN_SPAWN_TIME) {
+			enemy_spawn_threshold = MIN_SPAWN_TIME;
+		}
 
-	/* Enemies spawn every spawn_threshold seconds*/
-	if (enemy_spawn_timer > enemy_spawn_threshold && !end_game) {
-		spawnEnemies();
-		enemy_spawn_timer = 0;
-	}
+		/* Enemies spawn every spawn_threshold seconds*/
+		if (enemy_spawn_timer > enemy_spawn_threshold) {
+			spawnEnemies();
+			enemy_spawn_timer = 0;
+		}
 
-	/* Powerups spawn every 10 seconds */
-	if (powerup_spawn_timer > POWERUP_SPAWN_THRESHOLD && !freeze_enemies && !end_game) {
-		powerup_spawn_timer = 0;
-		spawnPowerup();
+		/* Powerups spawn every 10 seconds */
+		if (powerup_spawn_timer > POWERUP_SPAWN_THRESHOLD) {
+			powerup_spawn_timer = 0;
+			spawnPowerup();
+		}
 	}
 
 	/* If freeze is over, reset the timer */
 	if (freeze_timer > FREEZE_DURATION) {
-		freeze_enemies = false;
+		unfreezeGame();
 		freeze_timer = 0;
 	}
-}
-
-bool GameInstance::isEndGame(void) {
-	return this->end_game;
-}
-
-void GameInstance::OnGameEnd(void) {
-	this->end_game = true;
 }
 
 void GameInstance::spawnEnemies() {

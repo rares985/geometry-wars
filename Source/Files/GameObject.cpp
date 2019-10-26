@@ -25,9 +25,11 @@ bool GameObject::collidesWith(GameObject* other) {
 	bool collides = false;
 
 	if (this->isVisible() && other->isVisible()) {
-		float xdist = tx - other->tx;
-		float ydist = ty - other->ty;
-		float abs_dist = xdist * xdist + ydist * ydist;
+
+		glm::vec2 dist = getPosition() - other->getPosition();
+
+		float abs_dist = glm::dot(dist, dist);
+		
 		float radii_dist = (getSize() + other->getSize()) * (getSize() + other->getSize());
 
 		collides = (abs_dist <= radii_dist);
@@ -41,14 +43,12 @@ void GameObject::moveTowards(glm::vec2 &target) {
 	float dx = target.x - tx;
 	float dy = target.y - ty;
 
-	float dist = sqrt(dx*dx + dy*dy);
-
-	float steps = dist / 0.5f;
+	float steps = glm::distance(target, getPosition()) / 0.5f;
 
 	x_speed = dx / steps;
 	y_speed = dy / steps;
 
-	rotation = atan(dy / dx);
+	rotation = glm::atan(dy, dx);
 }
 
 void GameObject::computeModelMatrix(glm::mat3 &vis_matrix)

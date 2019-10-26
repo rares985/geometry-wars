@@ -26,33 +26,38 @@ public:
 	void updateScore(int diff);
 	void updateTimers(float deltaTimeSeconds);
 
-	bool isEndGame(void);
 
-	void OnGameEnd(void);
+	void OnGameEnd(void) { game_state = GameState::GS_ENDED; };
 
 	void spawnEnemies();
 
 	void spawnPowerup();
 
+	bool isFrozen(void) const { return game_state == GameState::GS_FROZEN; };
+	bool isEndGame(void) const { return game_state == GameState::GS_ENDED; };
+	bool isRunning(void) const { return game_state == GameState::GS_RUNNING; };
+
+	void freezeGame(void) { game_state = GameState::GS_FROZEN; };
+	void unfreezeGame(void) { game_state = GameState::GS_RUNNING; };
+
+
+
 	std::list<Enemy*> enemies;
 	std::list<Projectile*> projectiles;
 	std::list<Powerup*> powerups;
 	Player* player;
+	float freeze_timer;
 
 private:
 	long long int score;
-	bool end_game;
-	bool freeze_enemies;
 
 	float time_elapsed;
 	float enemy_spawn_timer;
 	float enemy_spawn_threshold;
 	float powerup_spawn_timer;
 	float powerup_spawn_threshold;
-	float freeze_timer;
 
 	GameState game_state;
-
 
 
 

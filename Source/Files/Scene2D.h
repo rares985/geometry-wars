@@ -73,21 +73,8 @@ class Scene2D : public SimpleScene
 		glm::mat3 vis_matrix;
 		glm::vec3 background_color;
 
-		//Player* player;
-		//std::list<Enemy*> enemies;
-		//std::list<Projectile*> projectiles;
-		//std::list<Powerup*> powerups;
-
 		GameInstance* game_instance;
 
-		float time_elapsed;
-		float enemy_spawn_timer;
-		float enemy_spawn_threshold;
-		float powerup_spawn_timer;
-		float powerup_spawn_threshold;
-		float freeze_timer;
-
-		bool freeze_enemies;
 };
 
 #endif /* SCENE_2D_H_ */

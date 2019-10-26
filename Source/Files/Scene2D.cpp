@@ -19,20 +19,6 @@ Scene2D::Scene2D()
 {
 	game_instance = new GameInstance();
 
-	freeze_enemies = false;
-
-	powerup_spawn_threshold = 0;
-	powerup_spawn_timer = 0;
-
-	enemy_spawn_threshold = 0;
-	enemy_spawn_timer = 0;
-
-	time_elapsed = 0;
-
-	freeze_timer = 0;
-
-	enemy_spawn_threshold = INITIAL_SPAWN_TIME;
-
 	/* define the logic space and width */
 	logic_space.x = 0;
 	logic_space.y = 0;
@@ -41,7 +27,6 @@ Scene2D::Scene2D()
 
 	background_color = black;
 
-	//player = new Player();
 }
 
 Scene2D::~Scene2D()
@@ -155,8 +140,8 @@ void Scene2D::Update(float deltaTimeSeconds) {
 		freezeScreen(vis_matrix);
 	}
 	else {
-		if (freeze_enemies) {
-			freeze_timer += deltaTimeSeconds;
+		if (game_instance->isFrozen()) {
+			game_instance->freeze_timer += deltaTimeSeconds;
 		}
 		DrawScene(vis_matrix, deltaTimeSeconds);
 	}
@@ -230,14 +215,13 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 			enemy->performShrink(deltaTimeSeconds);
 		}
 
-		if (!freeze_enemies) {
-			enemy->updatePosition(deltaTimeSeconds);
-			
-			enemy->computeModelMatrix(vis_matrix);
-		}
-
 		if (player.collidesWith(enemy)) {
 			player.collideWith(*enemy);
+		}
+
+		if (!game_instance->isFrozen()) {
+			enemy->updatePosition(deltaTimeSeconds);
+			enemy->computeModelMatrix(vis_matrix);
 		}
 
 		if (enemy->isVisible()) {
@@ -252,8 +236,8 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 		if (player.collidesWith(powerup)) {
 			player.collideWith(*powerup);
 			if (powerup->getMeshName() == "freeze") {
-				freeze_enemies = true;
-				freeze_timer = 0;
+				game_instance->freezeGame();
+				game_instance->freeze_timer = 0;
 			}
 		}
 		if (powerup->isVisible())
@@ -304,10 +288,8 @@ void Scene2D::OnInputUpdate(float deltaTime, int mods) {
 	player.rotateTowards(glm::vec2(logic_mouse_x, logic_mouse_y));
 }
 
-
-
-
 void Scene2D::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods) {
+
 	Player& player = *(game_instance->player);
 	std::list<Projectile*>& projectiles = game_instance->projectiles;
 
@@ -318,7 +300,6 @@ void Scene2D::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods) {
 		float logic_mouse_x = (float)(mouseX) / LOGIC_SCALE_FACTOR;
 		float logic_mouse_y = (float)(WINDOW_HEIGHT_PX - mouseY) / LOGIC_SCALE_FACTOR;
 
-	
 		projectile->setInitialPosition(player.getPosition());
 		projectile->moveTowards(glm::vec2(logic_mouse_x, logic_mouse_y));
 	
@@ -339,26 +320,29 @@ void Scene2D::freezeScreen(glm::mat3 vis_matrix) {
 
 	/*render enemies*/
 	for (auto enemy : enemies) {
-		if (enemy->isVisible())
-			RenderMesh2D(meshes[enemy->getMeshName()],shaders["VertexColor"],enemy->getModelMatrix());
+		if (enemy->isVisible()) {
+			RenderMesh2D(meshes[enemy->getMeshName()], shaders["VertexColor"], enemy->getModelMatrix());
+		}
 	}
 	for (auto proj : projectiles) {
-		if (proj->isVisible())
+		if (proj->isVisible()) {
 			RenderMesh2D(meshes[proj->getMeshName()], shaders["VertexColor"], proj->getModelMatrix());
+		}
 	}
 	/* render powerups */
 	for (auto powerup : powerups) {
 		powerup->computeModelMatrix(vis_matrix);
 
-		if (powerup->isVisible())
-			RenderMesh2D(meshes[powerup->getMeshName()] , shaders["VertexColor"], powerup->getModelMatrix());
+		if (powerup->isVisible()) {
+			RenderMesh2D(meshes[powerup->getMeshName()], shaders["VertexColor"], powerup->getModelMatrix());
+		}
 	}
 	/*render projectiles*/
 	float tx = 16.0f;
 	float ty = 8.5f;
 	for (int i = 0; i < player.lives_left; i++) {
 		tx -= (LIVES_SIZE + 0.1f);
-		glm::mat3 model_matrix = vis_matrix;
+		glm::mat3 model_matrix(vis_matrix);
 		model_matrix *= Transform2D::Translate(tx, ty);
 		RenderMesh2D(meshes["lives"], shaders["VertexColor"], model_matrix);
 	}

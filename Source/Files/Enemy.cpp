@@ -58,8 +58,15 @@ void Enemy::collideWith(Player& player)
 
 void Enemy::performShrink(float deltaTimeSeconds)
 {
-	if (this->scale > 0.75f)
+	if (this->scale > 0.75f) {
 		this->scale -= (0.5f * deltaTimeSeconds) / SHRINK_ANIMATION_DURATION; /* and it shrinks over 250ms to half size */
+	}
+
+	/* Doubles speed a LOT of times but only this way is it noticeable */
+	this->setMeshName("shrinked_enemy_ship");
+	this->x_speed *= 2;
+	this->y_speed *= 2;
+	this->setColor(firebrick);
 }
 
 void Enemy::takeDamage(int damage)
@@ -71,10 +78,5 @@ void Enemy::takeDamage(int damage)
 	}
 	else if (this->lives_left == 1) {
 		this->shrink = true;
-
-		this->setMeshName("shrinked_enemy_ship");
-		this->x_speed *= 2;
-		this->y_speed *= 2;
-		this->setColor(firebrick);
 	}
 }

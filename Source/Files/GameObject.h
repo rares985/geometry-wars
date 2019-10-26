@@ -32,7 +32,7 @@ class GameObject {
 		void		setSize(float size) { this->size = size; };
 		void		setScale(float scale) { this->scale = scale; };
 		void		setInitialPosition(float tx, float ty) { this->tx = tx; this->ty = ty; };
-		void		setInitialPosition(glm::vec2 pos) { this->tx = pos[0]; this->ty = pos[1]; };
+		void		setInitialPosition(glm::vec2 pos) { this->tx = pos.x; this->ty = pos.y; };
 		void		setMeshName(std::string mesh_name) { this->mesh_name = mesh_name; };
 		void		setColor(glm::vec3 color) { this->color = color; };
 		void		setCenter(glm::vec3 center) { this->center = center; };
