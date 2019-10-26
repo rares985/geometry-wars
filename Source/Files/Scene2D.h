@@ -67,12 +67,9 @@ class Scene2D : public SimpleScene
 
 		void spawnEnemies();
 
-		void eraseInvisibleEntities();
-
 		void freezeScreen(glm::mat3 visMatrix);
 
 		void spawnPowerup();
-
 
 	protected:
 		ViewportSpace view_space;

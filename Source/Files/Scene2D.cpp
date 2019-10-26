@@ -202,16 +202,27 @@ void Scene2D::Update(float deltaTimeSeconds)
 
 void Scene2D::FrameEnd()
 {
+	glm::vec2 low(0, 0);
+	glm::vec2 high(LOGIC_WINDOW_WIDTH, LOGIC_WINDOW_HEIGHT);
+	glm::vec2 pos;
 
+
+	for (auto proj : projectiles) {
+		pos = proj->getPosition();
+		if (glm::any(glm::lessThan(pos, low)) || glm::any(glm::greaterThan(pos, high))) {
+			proj->makeInvisible();
+		}
+	}
+		
+	projectiles.remove_if([](const Projectile* proj) {return !proj->isVisible(); });
+	enemies.remove_if([](const Enemy* enemy) {return !enemy->isVisible(); });
 }
 
 void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 {
 	
 	/* render the player's ship */
-
 	player->computeModelMatrix(vis_matrix);
-
 	RenderMesh2D(meshes["ship"],shaders["VertexColor"],player->getModelMatrix());
 	
 
@@ -220,25 +231,17 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 
 		float cuantif = 24 * deltaTimeSeconds;
 		proj->updatePosition(cuantif);
-
-		if (proj->tx < 0 || proj->tx > LOGIC_WINDOW_WIDTH) {
-			proj->visible = false;
-		}
-		if (proj->ty < 0 || proj->ty > LOGIC_WINDOW_HEIGHT) {
-			proj->visible = false;
-		}
-
 		proj->computeModelMatrix(vis_matrix);
 
 		/* check for enemy-projectile collision */
 		for (auto enemy : enemies) {
 
-			if (proj->visible && enemy->visible) { /* if objects are visible(if they can collide) */
+			if (proj->isVisible() && enemy->isVisible()) { /* if objects are visible(if they can collide) */
 				if (enemy->collidesWith(proj)) {
-					proj->visible = false;
+					proj->makeInvisible();
 
 					if (enemy->lives_left == 1) {
-						enemy->visible = false;
+						enemy->makeInvisible();
 						enemy->lives_left = 0;
 						game_instance->updateScore(enemy->initial_lives);
 						break; /* one projectile can damage 1 enemy only */
@@ -251,7 +254,7 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 				}
 			}
 		}
-		if (proj->visible == true)
+		if (proj->isVisible())
 			RenderMesh2D(meshes[proj->getMeshName()], shaders["VertexColor"], proj->getModelMatrix());
 	}
 
@@ -259,11 +262,11 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 	/* Render enemies and check for enemy-player collision */
 	for (auto enemy : enemies) {
 		
-		glm::vec2 player_pos = glm::vec2(player->tx, player->ty);
-		enemy->setMoveDirection(player_pos);
+		/* Make the enemy move towards the player */
+		enemy->setMoveDirection(player->getPosition());
 
 		if (enemy->shrink) { /* if the enemy is strong and has been hit, the speed doubles */
-			enemy->mesh_name = "shrinked_enemy_ship";
+			enemy->setMeshName("shrinked_enemy_ship");
 			enemy->x_speed *= 2;
 			enemy->y_speed *= 2;
 			enemy->setColor(firebrick);
@@ -278,39 +281,39 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 		}
 
 		
-		if (player->collidesWith(enemy) && enemy->visible)
+		if (player->collidesWith(enemy) && enemy->isVisible())
 		{
 			if (player->lives_left == 1)	{
 				game_instance->OnGameEnd();
-				enemy->visible = false;
+				enemy->makeInvisible();
 				player->lives_left--;
 			}
 			else if (player->lives_left > 1) {
 				player->lives_left--;
-				enemy->visible = false;
+				enemy->makeInvisible();
 			}
 		}
 
-		if (enemy->visible)
-				RenderMesh2D(meshes[enemy->getMeshName()], shaders["VertexColor"], enemy->model_matrix);
+		if (enemy->isVisible())
+				RenderMesh2D(meshes[enemy->getMeshName()], shaders["VertexColor"], enemy->getModelMatrix());
 	}
 
 	for (auto powerup : powerups) {
 
 		powerup->computeModelMatrix(vis_matrix);
 
-		if (player->collidesWith(powerup) && powerup->visible) {
-			if (powerup->mesh_name == "life") {
+		if (player->collidesWith(powerup) && powerup->isVisible()) {
+			if (powerup->getMeshName() == "life") {
 				player->lives_left++;
 			}
-			else if (powerup->mesh_name == "freeze") {
+			else if (powerup->getMeshName() == "freeze") {
 				freeze_enemies = true;
 				freeze_timer = 0;
 			}
-			powerup->visible = false;
+			powerup->makeInvisible();
 		}
-		if (powerup->visible)
-			RenderMesh2D(meshes[powerup->getMeshName()], shaders["VertexColor"], powerup->model_matrix);
+		if (powerup->isVisible())
+			RenderMesh2D(meshes[powerup->getMeshName()], shaders["VertexColor"], powerup->getModelMatrix());
 	}
 
 	float tx = 16.0f;
@@ -346,12 +349,16 @@ void Scene2D::OnInputUpdate(float deltaTime, int mods)
 
 	player->updatePosition(x_cuantif, y_cuantif);
 
+
 	glm::ivec2 mouse_pos = window->GetCursorPosition();
-	float logic_mouse_x = ((float)(mouse_pos.x)) / 80;
-	float logic_mouse_y = ((float)(window->GetResolution().y - mouse_pos.y)) / 80;
-	float x_diff = logic_mouse_x - player->tx;
-	float y_diff = logic_mouse_y - player->ty;
-	player->rotation = atan(y_diff / x_diff);
+	float logic_mouse_x = ((float)(mouse_pos.x)) / LOGIC_SCALE_FACTOR;
+	float logic_mouse_y = ((float)(window->GetResolution().y - mouse_pos.y)) / LOGIC_SCALE_FACTOR;
+
+	//float x_diff = logic_mouse_x - player->tx;
+	//float y_diff = logic_mouse_y - player->ty;
+	//s
+	player->rotateTowards(glm::vec2(logic_mouse_x, logic_mouse_y));
+	//player->rotation = atan(y_diff / x_diff);
 }
 
 
@@ -362,16 +369,18 @@ void Scene2D::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 	if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_LEFT)) {
 		
 		Projectile* projectile = new Projectile();
-		projectile->setInitialPosition(player->tx, player->ty);
+		projectile->setInitialPosition(player->getPosition());
 
-		float logic_mouse_x = ((float)(mouseX)) / 80;
-		float logic_mouse_y = ((float)(window->GetResolution().y - mouseY)) / 80;
+		float logic_mouse_x = ((float)(mouseX)) / LOGIC_SCALE_FACTOR;
+		float logic_mouse_y = ((float)(window->GetResolution().y - mouseY)) / LOGIC_SCALE_FACTOR;
 		glm::vec2 mouse_pos = glm::vec2(logic_mouse_x, logic_mouse_y);
 		
 		projectile->setMoveDirection(mouse_pos);
 	
 		projectiles.push_back(projectile);
 	}
+
+	std::cout << "Proj Size = " << projectiles.size() << std::endl;
 
 }
 
@@ -382,8 +391,7 @@ void Scene2D::spawnEnemies() {
 
 
 			float angle = (float)rand();
-			float px = player->tx;
-			float py = player->ty;
+			glm::vec2 player_pos = player->getPosition();
 
 			float radius = ENEMY_SPAWN_DISTANCE;
 
@@ -398,9 +406,8 @@ void Scene2D::spawnEnemies() {
 			enemy = new Enemy(lives_count);
 			enemy->setCenter(origin);
 
-			enemy->setInitialPosition(px + x, py + y);
+			enemy->setInitialPosition(player_pos + glm::vec2(x, y));
 
-			glm::vec2 player_pos = glm::vec2(player->tx, player->ty);
 			enemy->setMoveDirection(player_pos);
 			float speedCuantifier = (float)(rand() % 3 + 1);
 
@@ -412,39 +419,26 @@ void Scene2D::spawnEnemies() {
 		}
 }
 
-void Scene2D::eraseInvisibleEntities() {
-	std::list<Projectile*>::iterator projectile;
-	for (projectile = std::begin(projectiles); projectile != std::end(projectiles); ++projectile) {
-		if (!(*projectile)->visible)
-			projectiles.erase(projectile);
-	}
-	std::list<Enemy*>::iterator enemy;
-	for (enemy = std::begin(enemies); enemy != std::end(enemies); ++enemy) {
-		if (!(*enemy)->visible)
-			enemies.erase(enemy);
-	}
-}
-
 void Scene2D::freezeScreen(glm::mat3 vis_matrix) {
 
 	/*render player*/
-	RenderMesh2D(meshes["ship"],shaders["VertexColor"],player->model_matrix);
+	RenderMesh2D(meshes["ship"],shaders["VertexColor"],player->getModelMatrix());
 
 	/*render enemies*/
 	for (auto enemy : enemies) {
-		if (enemy->visible)
-			RenderMesh2D(meshes[enemy->getMeshName()],shaders["VertexColor"],enemy->model_matrix);
+		if (enemy->isVisible())
+			RenderMesh2D(meshes[enemy->getMeshName()],shaders["VertexColor"],enemy->getModelMatrix());
 	}
 	for (auto proj : projectiles) {
-		if (proj->visible)
-			RenderMesh2D(meshes[proj->getMeshName()], shaders["VertexColor"], proj->model_matrix);
+		if (proj->isVisible())
+			RenderMesh2D(meshes[proj->getMeshName()], shaders["VertexColor"], proj->getModelMatrix());
 	}
 	/* render powerups */
 	for (auto powerup : powerups) {
 		powerup->computeModelMatrix(vis_matrix);
 
-		if (powerup->visible)
-			RenderMesh2D(meshes[powerup->getMeshName()] , shaders["VertexColor"], powerup->model_matrix);
+		if (powerup->isVisible())
+			RenderMesh2D(meshes[powerup->getMeshName()] , shaders["VertexColor"], powerup->getModelMatrix());
 	}
 	/*render projectiles*/
 	float tx = 16.0f;

@@ -24,9 +24,16 @@
 #define POWERUP_SPAWN_THRESHOLD 10.0f
 #define FREEZE_DURATION 2.0f
 
+/* Size of window in PX */
+#define WINDOW_WIDTH_PX		1280
+#define WINDOW_HEIGHT_PX	720
+
+/* Size of Logic space of window */
 #define LOGIC_WINDOW_HEIGHT 9
 #define LOGIC_WINDOW_WIDTH 16
 
+/* Scaling factor... */
+#define LOGIC_SCALE_FACTOR 80 /* WINDOW_WIDTH / LOGIC_WIDTH */
 
 /* rgb colour codes */
 #define black  glm::vec3(0, 0, 0)

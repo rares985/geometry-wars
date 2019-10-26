@@ -3,6 +3,8 @@
 #include "Player.h"
 #include "Projectile.h"
 
+
+
 Enemy::Enemy(int enemy_type) {
 	if (enemy_type == 1) {
 		this->mesh_name = "weak_enemy_ship";
@@ -13,7 +15,7 @@ Enemy::Enemy(int enemy_type) {
 		this->setColor(gold);
 	}
 	this->setSize(DEFAULT_ENEMY_SIZE);
-	this->initial_lives = enemy_type;
+	this->initial_lives = enemy_type; /* Ugly hack, TODO remove */
 	this->lives_left = this->initial_lives;
 }
 

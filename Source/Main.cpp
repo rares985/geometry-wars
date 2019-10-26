@@ -4,11 +4,11 @@
 #include <Core/Engine.h>
 
 #include "Files/Scene2D.h"
+#include "Files/constants.h"
 
 using namespace std;
 
-#define WINDOW_WIDTH_PX		1280
-#define WINDOW_HEIGHT_PX	720
+
 
 int main(int argc, char **argv)
 {

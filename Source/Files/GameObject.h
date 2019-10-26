@@ -18,7 +18,7 @@ class GameObject {
 		~GameObject();
 
 		/* Attributes */
-		float tx, ty;
+
 		float scale;
 		float rotation;
 
@@ -27,36 +27,38 @@ class GameObject {
 		int initial_lives;
 		int lives_left;
 
-		bool visible;
+
 		bool shrink;
 
-		glm::vec3 center;
 
-		std::string mesh_name;
+
 
 		glm::mat3 model_matrix = glm::mat3();
 
 
-
 		void setMoveDirection(glm::vec2 target);
-		void setMeshName(std::string mesh_name) { this->mesh_name = mesh_name; };
 
-		bool isVisible(void) { return this->visible; };
-
-		void setColor(glm::vec3 color) { this->color = color; };
 		void setSize(float size) { this->size = size; };
-		void setCenter(glm::vec3 center) { this->center = center; };
 		void setInitialPosition(float tx, float ty) { this->tx = tx; this->ty = ty; };
+		void setInitialPosition(glm::vec2 pos) { this->tx = pos[0]; this->ty = pos[1]; };
+		void setMeshName(std::string mesh_name) { this->mesh_name = mesh_name; };
+		void setColor(glm::vec3 color) { this->color = color; };
+		void setCenter(glm::vec3 center) { this->center = center; };
+		void rotateTowards(glm::vec2 target) { this->rotation = atan((target.y - ty) / (target.x - tx)); };
+		void makeInvisible(void) { this->visible = false; };
 
-		std::string getMeshName() { return this->mesh_name; };
+
+		bool isVisible(void) const { return this->visible; };
 
 		void computeModelMatrix(glm::mat3 &vis_matrix);
 
-		glm::vec3 getColor() { return this->color; };
-		float getSize() { return this->size; };
-		glm::vec3 getCenter() { return this->center; };
-		glm::mat3 getModelMatrix() { return this->model_matrix; };
-		int getLivesLeft() { return this->lives_left; };
+		int getLivesLeft() const { return this->lives_left; };
+		float getSize() const { return this->size; };
+		std::string getMeshName() const { return this->mesh_name; };
+		glm::vec2 getPosition() const { return glm::vec2(this->tx, this->ty); };
+		glm::vec3 getColor() const { return this->color; };
+		glm::vec3 getCenter() const { return this->center; };
+		glm::mat3 getModelMatrix() const { return this->model_matrix; };
 
 		bool collidesWith(GameObject* other);
 
@@ -68,6 +70,13 @@ class GameObject {
 private:
 	glm::vec3 color = glm::vec3();
 	float size = 0.0f;
+
+protected:
+	std::string mesh_name;
+	glm::vec3 center;
+	bool visible;
+	float tx, ty;
+
 };
 
 #endif /* GAME_OBJECT_H_ */

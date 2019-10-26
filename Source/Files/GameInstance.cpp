@@ -77,8 +77,7 @@ void GameInstance::spawnEnemies() {
 
 
 		float angle = (float)rand();
-		float px = player->tx;
-		float py = player->ty;
+		glm::vec2 player_pos = player->getPosition();
 
 		float radius = ENEMY_SPAWN_DISTANCE;
 
@@ -93,9 +92,8 @@ void GameInstance::spawnEnemies() {
 		enemy = new Enemy(lives_count);
 		enemy->setCenter(origin);
 
-		enemy->setInitialPosition(px + x, py + y);
+		enemy->setInitialPosition(player_pos + glm::vec2(x, y));
 
-		glm::vec2 player_pos = glm::vec2(player->tx, player->ty);
 		enemy->setMoveDirection(player_pos);
 		float speedCuantifier = (float)(rand() % 3 + 1);
 
