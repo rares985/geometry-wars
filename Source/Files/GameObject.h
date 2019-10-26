@@ -18,8 +18,6 @@ class GameObject {
 		~GameObject();
 
 		/* Attributes */
-
-		float scale;
 		float rotation;
 
 		float x_speed, y_speed;
@@ -39,6 +37,7 @@ class GameObject {
 		void setMoveDirection(glm::vec2 target);
 
 		void setSize(float size) { this->size = size; };
+		void setScale(float scale) { this->scale = scale; };
 		void setInitialPosition(float tx, float ty) { this->tx = tx; this->ty = ty; };
 		void setInitialPosition(glm::vec2 pos) { this->tx = pos[0]; this->ty = pos[1]; };
 		void setMeshName(std::string mesh_name) { this->mesh_name = mesh_name; };
@@ -54,11 +53,12 @@ class GameObject {
 
 		int getLivesLeft() const { return this->lives_left; };
 		float getSize() const { return this->size; };
+		float getScale() const { return this->scale; };
 		std::string getMeshName() const { return this->mesh_name; };
 		glm::vec2 getPosition() const { return glm::vec2(this->tx, this->ty); };
 		glm::vec3 getColor() const { return this->color; };
 		glm::vec3 getCenter() const { return this->center; };
-		glm::mat3 getModelMatrix() const { return this->model_matrix; };
+		glm::mat3& getModelMatrix() { return this->model_matrix; };
 
 		bool collidesWith(GameObject* other);
 
@@ -76,6 +76,7 @@ protected:
 	glm::vec3 center;
 	bool visible;
 	float tx, ty;
+	float scale;
 
 };
 

@@ -7,6 +7,8 @@ GameInstance::GameInstance() {
 	this->score = 0;
 	this->end_game = false;
 
+	this->game_state = GameState::GS_NOT_STARTED;
+
 	this->time_elapsed = 0.0f;
 	this->enemy_spawn_timer = 0.0f;
 	this->enemy_spawn_threshold = 0.0f;
@@ -72,7 +74,6 @@ void GameInstance::OnGameEnd(void) {
 }
 
 void GameInstance::spawnEnemies() {
-	srand((unsigned int)time_elapsed);
 	for (int i = 0; i < 3; i++) {
 
 

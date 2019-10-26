@@ -2,6 +2,7 @@
 #include "constants.h"
 #include "Player.h"
 #include "Projectile.h"
+#include <iostream>
 
 
 
@@ -60,7 +61,15 @@ void Enemy::takeDamage(int damage)
 {
 	this->lives_left -= damage;
 
-	if (this->lives_left < 0) {
+	if (this->lives_left <= 0) {
 		this->visible = false;
+	}
+	else if (this->lives_left == 1) {
+		this->shrink = true;
+
+		this->setMeshName("shrinked_enemy_ship");
+		this->x_speed *= 2;
+		this->y_speed *= 2;
+		this->setColor(firebrick);
 	}
 }

@@ -12,6 +12,9 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
+	/* Seed the RNG */
+	srand(time(NULL));
+	
 	
 	WindowProperties wp;
 	wp.resolution = glm::ivec2(WINDOW_WIDTH_PX, WINDOW_HEIGHT_PX);

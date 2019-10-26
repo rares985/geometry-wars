@@ -1,5 +1,6 @@
 #include "Projectile.h"
 #include "constants.h"
+#include <iostream>
 
 Projectile::Projectile() {
 	this->mesh_name = "projectile";
@@ -23,6 +24,7 @@ void Projectile::collideWith(Enemy& enemy) {
 
 	/* Disappear */
 	this->visible = false;
+
 }
 
 void Projectile::collideWith(Projectile& projectile) {

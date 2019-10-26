@@ -21,11 +21,18 @@ GameObject::~GameObject()
 }
 
 bool GameObject::collidesWith(GameObject* other) {
-	float xdist = tx - other->tx;
-	float ydist = ty - other->ty;
-	float abs_dist = xdist * xdist + ydist * ydist;
-	float radii_dist = (getSize() + other->getSize()) * (getSize() + other->getSize());
-	return (abs_dist <= radii_dist);
+	bool collides = false;
+
+	if (this->isVisible() && other->isVisible()) {
+		float xdist = tx - other->tx;
+		float ydist = ty - other->ty;
+		float abs_dist = xdist * xdist + ydist * ydist;
+		float radii_dist = (getSize() + other->getSize()) * (getSize() + other->getSize());
+
+		collides = (abs_dist <= radii_dist);
+	}
+
+	return collides;
 }
 
 void GameObject::setMoveDirection(glm::vec2 target) {

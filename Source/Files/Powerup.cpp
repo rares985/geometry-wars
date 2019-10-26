@@ -39,4 +39,7 @@ void Powerup::collideWith(Powerup& powerup){
 void Powerup::collideWith(Player& player)
 {
 	/* Notified by player, apply effect ? */
+
+	/* disappear */
+	this->visible = false;
 }

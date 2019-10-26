@@ -28,11 +28,11 @@ void Player::updatePosition(float x_cuantif, float y_cuantif) {
 }
 
 void Player::collideWith(Enemy& enemy) {
-	/* Notify enemy that it collided with us, it will take damage */
-	enemy.collideWith(*this);
-
 	/* take Damage */
 	this->takeDamage(enemy.getLivesLeft());
+
+	/* Notify enemy that it collided with us, it will take damage */
+	enemy.collideWith(*this);
 }
 
 void Player::collideWith(Projectile& enemy) {
@@ -42,6 +42,11 @@ void Player::collideWith(Projectile& enemy) {
 void Player::collideWith(Powerup& powerup) {
 	/* Notify powerup that it collided with us...will apply an efect */
 	powerup.collideWith(*this);
+
+	/* Apply effect -- TODO freeze from here */
+	if (powerup.getMeshName() == "life") {
+		this->lives_left++;
+	}
 
 }
 
