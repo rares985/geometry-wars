@@ -14,10 +14,10 @@ public:
 
 	void	updatePosition(float speed_cuantif);
 
-	void	collideWith(Enemy& enemy) override;
-	void	collideWith(Projectile& projectile) override;
-	void	collideWith(Powerup& powerup) override;
-	void	collideWith(Player& player) override;
+	void	handleCollisionWith(Enemy& enemy) override;
+	void	handleCollisionWith(Projectile& projectile) override;
+	void	handleCollisionWith(Powerup& powerup) override;
+	void	handleCollisionWith(Player& player) override;
 
 };
 

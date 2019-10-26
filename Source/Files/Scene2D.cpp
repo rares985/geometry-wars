@@ -118,56 +118,39 @@ void Scene2D::FrameStart()
 
 void Scene2D::Update(float deltaTimeSeconds) {
 
-	bool end_game = game_instance->isEndGame();
-
-	game_instance->updateTimers(deltaTimeSeconds);
-	
-	/* If game has ended , the background color fades to red */
-	if (end_game)
-		if (background_color.x <= 1.0f) {
-			background_color += glm::vec3(deltaTimeSeconds / 2.0f, 0, 0);
-		}
+	GameState gs = game_instance->getGameState();
 
 	glm::ivec2 resolution = window->GetResolution();
-
 	view_space = ViewportSpace(0, 0, resolution.x, resolution.y);
 	SetViewportArea(view_space,background_color, true);
 	
-	vis_matrix = glm::mat3(1);
-	vis_matrix *= VisualizationTransf2DUnif(logic_space, view_space);
+	vis_matrix = VisualizationTransf2DUnif(logic_space, view_space);
 
-	if (end_game) {
-		freezeScreen(vis_matrix);
-	}
-	else {
-		if (game_instance->isFrozen()) {
+	switch (gs) {
+
+		case GameState::GS_ENDED:
+			if (background_color.x <= 1.0f) {
+				background_color += glm::vec3(deltaTimeSeconds / 2.0f, 0, 0);
+			}
+			freezeScreen(vis_matrix);
+			break;
+
+		case GameState::GS_FROZEN:
 			game_instance->freeze_timer += deltaTimeSeconds;
-		}
-		DrawScene(vis_matrix, deltaTimeSeconds);
+
+		default:
+			DrawScene(vis_matrix, deltaTimeSeconds);
+			break;
 	}
+
+	game_instance->updateTimers(deltaTimeSeconds);
 }
 
 void Scene2D::FrameEnd()
 {
 	Player &player = *(game_instance->player);
-	std::list<Projectile*>& projectiles = game_instance->projectiles;
-	std::list<Enemy*>& enemies = game_instance->enemies;
-	std::list<Powerup*>& powerups = game_instance->powerups;
 
-	glm::vec2 low(0, 0);
-	glm::vec2 high(LOGIC_WINDOW_WIDTH, LOGIC_WINDOW_HEIGHT);
-	glm::vec2 pos;
-
-	for (auto proj : projectiles) {
-		pos = proj->getPosition();
-		if (glm::any(glm::lessThan(pos, low)) || glm::any(glm::greaterThan(pos, high))) {
-			proj->makeInvisible();
-		}
-	}
-		
-	projectiles.remove_if([](const Projectile* proj) {return !proj->isVisible(); });
-	enemies.remove_if([](const Enemy* enemy) {return !enemy->isVisible(); });
-	powerups.remove_if([](const Powerup* powerup) {return !powerup->isVisible(); });
+	game_instance->deleteInvisibleEntities();
 
 	if (player.isDead()) {
 		game_instance->OnGameEnd();
@@ -196,7 +179,7 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 		/* check for enemy-projectile collision */
 		for (auto enemy : enemies) {
 			if (enemy->collidesWith(proj)) {
-				enemy->collideWith(*proj);
+				enemy->handleCollisionWith(*proj);
 				// game_instance->updateScore(enemy->initial_lives);
 			}
 		}
@@ -216,7 +199,7 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 		}
 
 		if (player.collidesWith(enemy)) {
-			player.collideWith(*enemy);
+			player.handleCollisionWith(*enemy);
 		}
 
 		if (!game_instance->isFrozen()) {
@@ -234,7 +217,7 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 		powerup->computeModelMatrix(vis_matrix);
 
 		if (player.collidesWith(powerup)) {
-			player.collideWith(*powerup);
+			player.handleCollisionWith(*powerup);
 			if (powerup->getMeshName() == "freeze") {
 				game_instance->freezeGame();
 				game_instance->freeze_timer = 0;

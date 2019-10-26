@@ -23,20 +23,20 @@ Powerup::~Powerup() {
 
 }
 
-void Powerup::collideWith(Enemy& enemy)
+void Powerup::handleCollisionWith(Enemy& enemy)
 {
 	// No collision possible between enemies and powerups...
 }
 
-void Powerup::collideWith(Projectile& projectile) {
+void Powerup::handleCollisionWith(Projectile& projectile) {
 	// No collision possible betwen projectiles and powerups...
 }
 
-void Powerup::collideWith(Powerup& powerup){
+void Powerup::handleCollisionWith(Powerup& powerup){
 	// No collision possible between powerups...
 }
 
-void Powerup::collideWith(Player& player)
+void Powerup::handleCollisionWith(Player& player)
 {
 	/* Notified by player, apply effect ? */
 

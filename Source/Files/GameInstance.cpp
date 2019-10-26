@@ -109,3 +109,22 @@ void GameInstance::spawnPowerup() {
 
 	powerups.push_back(powerup);
 }
+
+void GameInstance::deleteInvisibleEntities()
+{
+	glm::vec2 low(0, 0);
+	glm::vec2 high(LOGIC_WINDOW_WIDTH, LOGIC_WINDOW_HEIGHT);
+	glm::vec2 pos;
+
+	for (auto proj : projectiles) {
+		pos = proj->getPosition();
+		if (glm::any(glm::lessThan(pos, low)) || glm::any(glm::greaterThan(pos, high))) {
+			proj->makeInvisible();
+		}
+	}
+
+	projectiles.remove_if([](const Projectile* proj) {return !proj->isVisible(); });
+	enemies.remove_if([](const Enemy* enemy) {return !enemy->isVisible(); });
+	powerups.remove_if([](const Powerup* powerup) {return !powerup->isVisible(); });
+
+}

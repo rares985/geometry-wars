@@ -19,7 +19,7 @@ void Projectile::updatePosition(float speed_cuantif) {
 	this->ty += this->y_speed * speed_cuantif;
 }
 
-void Projectile::collideWith(Enemy& enemy) {
+void Projectile::handleCollisionWith(Enemy& enemy) {
 	/* Notified by enemy */
 
 	/* Disappear */
@@ -27,14 +27,14 @@ void Projectile::collideWith(Enemy& enemy) {
 
 }
 
-void Projectile::collideWith(Projectile& projectile) {
+void Projectile::handleCollisionWith(Projectile& projectile) {
 	// No collision possible between projectiles...
 }
 
-void Projectile::collideWith(Powerup& powerup) {
+void Projectile::handleCollisionWith(Powerup& powerup) {
 	// No collision possible between powerups and projectiles...
 }
 
-void Projectile::collideWith(Player& player) {
+void Projectile::handleCollisionWith(Player& player) {
 	// No collision possible between projectile and player...
 }

@@ -27,21 +27,21 @@ void Player::updatePosition(float x_cuantif, float y_cuantif) {
 	this->ty += y_cuantif;
 }
 
-void Player::collideWith(Enemy& enemy) {
+void Player::handleCollisionWith(Enemy& enemy) {
 	/* take Damage */
 	this->takeDamage(enemy.getLivesLeft());
 
 	/* Notify enemy that it collided with us, it will take damage */
-	enemy.collideWith(*this);
+	enemy.handleCollisionWith(*this);
 }
 
-void Player::collideWith(Projectile& enemy) {
+void Player::handleCollisionWith(Projectile& enemy) {
 	// no collision possible between player and projectile...
 }
 
-void Player::collideWith(Powerup& powerup) {
+void Player::handleCollisionWith(Powerup& powerup) {
 	/* Notify powerup that it collided with us...will apply an efect */
-	powerup.collideWith(*this);
+	powerup.handleCollisionWith(*this);
 
 	/* Apply effect -- TODO freeze from here */
 	if (powerup.getMeshName() == "life") {
@@ -50,7 +50,7 @@ void Player::collideWith(Powerup& powerup) {
 
 }
 
-void Player::collideWith(Player& player) {
+void Player::handleCollisionWith(Player& player) {
 	// No collision possible between two players ...
 }
 

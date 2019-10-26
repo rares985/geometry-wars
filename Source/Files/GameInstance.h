@@ -24,20 +24,24 @@ public:
 	GameInstance();
 	~GameInstance();
 
-	void	updateScore(int diff);
-	void	updateTimers(float deltaTimeSeconds);
+	void		updateScore(int diff);
+	void		updateTimers(float deltaTimeSeconds);
 
-	void	spawnEnemies();
-	void	spawnPowerup();
+	void		spawnEnemies();
+	void		spawnPowerup();
 
-	void	OnGameEnd(void) { game_state = GameState::GS_ENDED; };
+	void		OnGameEnd(void) { game_state = GameState::GS_ENDED; };
 
-	bool	isFrozen(void) const { return game_state == GameState::GS_FROZEN; };
-	bool	isEndGame(void) const { return game_state == GameState::GS_ENDED; };
-	bool	isRunning(void) const { return game_state == GameState::GS_RUNNING; };
+	bool		isFrozen(void) const { return game_state == GameState::GS_FROZEN; };
+	bool		isEndGame(void) const { return game_state == GameState::GS_ENDED; };
+	bool		isRunning(void) const { return game_state == GameState::GS_RUNNING; };
 
-	void	freezeGame(void) { game_state = GameState::GS_FROZEN; };
-	void	unfreezeGame(void) { game_state = GameState::GS_RUNNING; };
+	void		freezeGame(void) { game_state = GameState::GS_FROZEN; };
+	void		unfreezeGame(void) { game_state = GameState::GS_RUNNING; };
+
+	void		deleteInvisibleEntities();
+
+	GameState	getGameState() const { return game_state; };
 
 	float						freeze_timer;
 

@@ -30,26 +30,26 @@ void Enemy::updatePosition(float speed_cuantif)
 	this->ty += this->y_speed * speed_cuantif;
 }
 
-void Enemy::collideWith(Enemy& enemy)
+void Enemy::handleCollisionWith(Enemy& enemy)
 {
 	// No collision possible between enemies...
 }
 
-void Enemy::collideWith(Projectile& projectile)
+void Enemy::handleCollisionWith(Projectile& projectile)
 {
 	/* notify projectile that it collided with us */
-	projectile.collideWith(*this);
+	projectile.handleCollisionWith(*this);
 
 	/* take damage */
 	this->takeDamage(1);
 }
 
-void Enemy::collideWith(Powerup& powerup)
+void Enemy::handleCollisionWith(Powerup& powerup)
 {
 	// No collision possible between enemy and powerup...
 }
 
-void Enemy::collideWith(Player& player)
+void Enemy::handleCollisionWith(Player& player)
 {
 	/* notified by player, only take damage */
 

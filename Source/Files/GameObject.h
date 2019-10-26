@@ -17,64 +17,64 @@ class GameObject {
 		GameObject();
 		~GameObject();
 
-		float		rotation;
-		float		x_speed;
-		float		y_speed;
+		float			rotation;
+		float			x_speed;
+		float			y_speed;
 
-		int			initial_lives;
-		int			lives_left;
+		int				initial_lives;
+		int				lives_left;
 
-		bool		shrink;
+		bool			shrink;
 
-		glm::mat3	model_matrix = glm::mat3();
-
-
-		void		moveTowards(glm::vec2 &target);
-
-		void		setSize(float size) { this->size = size; };
-		void		setScale(float scale) { this->scale = scale; };
-		void		setInitialPosition(float tx, float ty) { this->tx = tx; this->ty = ty; };
-		void		setInitialPosition(glm::vec2 pos) { this->tx = pos.x; this->ty = pos.y; };
-		void		setMeshName(std::string mesh_name) { this->mesh_name = mesh_name; };
-		void		setColor(glm::vec3 color) { this->color = color; };
-		void		setCenter(glm::vec3 center) { this->center = center; };
-		void		rotateTowards(glm::vec2 target) { this->rotation = atan((target.y - ty) / (target.x - tx)); };
-		void		makeInvisible(void) { this->visible = false; };
+		glm::mat3		model_matrix = glm::mat3();
 
 
-		bool		isVisible(void) const { return this->visible; };
+		void			moveTowards(const glm::vec2 &target);
 
-		void		computeModelMatrix(glm::mat3 &vis_matrix);
+		void			setSize(float size) { this->size = size; };
+		void			setScale(float scale) { this->scale = scale; };
+		void			setInitialPosition(float tx, float ty) { this->tx = tx; this->ty = ty; };
+		void			setInitialPosition(glm::vec2 pos) { this->tx = pos.x; this->ty = pos.y; };
+		void			setMeshName(std::string mesh_name) { this->mesh_name = mesh_name; };
+		void			setColor(glm::vec3 color) { this->color = color; };
+		void			setCenter(glm::vec3 center) { this->center = center; };
+		void			rotateTowards(glm::vec2 target) { this->rotation = atan((target.y - ty) / (target.x - tx)); };
+		void			makeInvisible(void) { this->visible = false; };
 
-		int			getLivesLeft() const { return this->lives_left; };
-		float		getSize() const { return this->size; };
-		float		getScale() const { return this->scale; };
-		std::string getMeshName() const { return this->mesh_name; };
-		glm::vec2	getPosition() const { return glm::vec2(this->tx, this->ty); };
-		glm::vec3	getColor() const { return this->color; };
-		glm::vec3	getCenter() const { return this->center; };
-		glm::mat3&	getModelMatrix() { return this->model_matrix; };
 
-		bool		collidesWith(GameObject* other);
+		bool			isVisible(void) const { return this->visible; };
 
-		virtual void collideWith(Player& player) = 0;
-		virtual void collideWith(Projectile& projectile) = 0;
-		virtual void collideWith(Enemy& enemy) = 0;
-		virtual void collideWith(Powerup& powerup) = 0;
+		void			computeModelMatrix(const glm::mat3 &vis_matrix);
+
+		int				getLivesLeft() const { return this->lives_left; };
+		float			getSize() const { return this->size; };
+		float			getScale() const { return this->scale; };
+		std::string		getMeshName() const { return this->mesh_name; };
+		glm::vec2		getPosition() const { return glm::vec2(this->tx, this->ty); };
+		glm::vec3		getColor() const { return this->color; };
+		glm::vec3		getCenter() const { return this->center; };
+		glm::mat3&		getModelMatrix() { return this->model_matrix; };
+
+		bool			collidesWith(const GameObject* other);
+
+		virtual void	handleCollisionWith(Player&		player)		= 0;
+		virtual void	handleCollisionWith(Projectile& projectile) = 0;
+		virtual void	handleCollisionWith(Enemy&		enemy)		= 0;
+		virtual void	handleCollisionWith(Powerup&	powerup)	= 0;
 
 private:
-	float			size;
-	glm::vec3		color;
+	float				size;
+	glm::vec3			color;
 
 protected:
-	bool			visible;
+	bool				visible;
 
-	float			tx;
-	float			ty;
-	float			scale;
+	float				tx;
+	float				ty;
+	float				scale;
 
-	std::string		mesh_name;
-	glm::vec3		center;
+	std::string			mesh_name;
+	glm::vec3			center;
 
 };
 
