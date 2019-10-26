@@ -18,6 +18,8 @@ public:
 	void collideWith(Powerup& powerup) override;
 	void collideWith(Player& player) override;
 
+	bool isDead(void) const;
+
 
 private:
 

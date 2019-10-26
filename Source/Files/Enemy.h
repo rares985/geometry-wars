@@ -17,9 +17,13 @@ public:
 	void collideWith(Powerup& powerup) override;
 	void collideWith(Player& player) override;
 
+	void performShrink(float deltaTimeSeconds);
+
 private:
 
 	void takeDamage(int damage);
+
+
 
 };
 

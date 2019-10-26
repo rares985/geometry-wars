@@ -221,6 +221,10 @@ void Scene2D::FrameEnd()
 	std::cout << "Projectiles Size: " << projectiles.size() << std::endl;
 	std::cout << "Enemies Size: " << enemies.size() << std::endl;
 	std::cout << "Powerups Size: " << powerups.size() << std::endl;
+
+	if (player->isDead()) {
+		game_instance->OnGameEnd();
+	}
 }
 
 void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
@@ -254,11 +258,10 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 	for (auto enemy : enemies) {
 		
 		/* Make the enemy move towards the player */
-		enemy->setMoveDirection(player->getPosition());
+		enemy->moveTowards(player->getPosition());
 
 		if (enemy->shrink) { /* if the enemy is strong and has been hit, the speed doubles */
-			if (enemy->getScale() > 0.75f)
-				enemy->setScale(enemy->getScale() - (0.5f*deltaTimeSeconds) / SHRINK_ANIMATION_DURATION); /* and it shrinks over 250ms to half size */
+			enemy->performShrink(deltaTimeSeconds);
 		}
 
 		if (!freeze_enemies) {
@@ -269,13 +272,11 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 
 		if (player->collidesWith(enemy)) {
 			player->collideWith(*enemy);
-			if (player->lives_left <= 0) {
-				game_instance->OnGameEnd();
-			}
 		}
 
-		if (enemy->isVisible())
-				RenderMesh2D(meshes[enemy->getMeshName()], shaders["VertexColor"], enemy->getModelMatrix());
+		if (enemy->isVisible()) {
+			RenderMesh2D(meshes[enemy->getMeshName()], shaders["VertexColor"], enemy->getModelMatrix());
+		}
 	}
 
 	for (auto powerup : powerups) {
@@ -328,8 +329,9 @@ void Scene2D::OnInputUpdate(float deltaTime, int mods)
 
 
 	glm::ivec2 mouse_pos = window->GetCursorPosition();
-	float logic_mouse_x = ((float)(mouse_pos.x)) / LOGIC_SCALE_FACTOR;
-	float logic_mouse_y = ((float)(window->GetResolution().y - mouse_pos.y)) / LOGIC_SCALE_FACTOR;
+
+	float logic_mouse_x = (float)(mouse_pos.x) / LOGIC_SCALE_FACTOR;
+	float logic_mouse_y = (float)(WINDOW_HEIGHT_PX - mouse_pos.y) / LOGIC_SCALE_FACTOR;
 
 	player->rotateTowards(glm::vec2(logic_mouse_x, logic_mouse_y));
 }
@@ -342,14 +344,13 @@ void Scene2D::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 	if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_LEFT)) {
 		
 		Projectile* projectile = new Projectile();
+
+		float logic_mouse_x = (float)(mouseX) / LOGIC_SCALE_FACTOR;
+		float logic_mouse_y = (float)(WINDOW_HEIGHT_PX - mouseY) / LOGIC_SCALE_FACTOR;
+
+	
 		projectile->setInitialPosition(player->getPosition());
-
-		float logic_mouse_x = ((float)(mouseX)) / LOGIC_SCALE_FACTOR;
-		float logic_mouse_y = ((float)(window->GetResolution().y - mouseY)) / LOGIC_SCALE_FACTOR;
-
-		glm::vec2 mouse_pos = glm::vec2(logic_mouse_x, logic_mouse_y);
-		
-		projectile->setMoveDirection(mouse_pos);
+		projectile->moveTowards(glm::vec2(logic_mouse_x, logic_mouse_y));
 	
 		projectiles.push_back(projectile);
 	}
@@ -358,33 +359,25 @@ void Scene2D::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 
 void Scene2D::spawnEnemies() {
 
-	for (int i = 0; i < 3; i++) {
-
+	for (int i = 0; i < ENEMIES_SPAWNED_PER_ROUND; i++) {
 
 		float angle = (float)rand();
 		glm::vec2 player_pos = player->getPosition();
+		glm::vec2 polar_pos(cos(angle), sin(angle));
 
-		float radius = ENEMY_SPAWN_DISTANCE;
-
-		float x = cos(angle)*radius;
-		float y = sin(angle)*radius;
-
-
-		Enemy* enemy;
+		/* Convert from angle to distance */
+		polar_pos *= ENEMY_SPAWN_DISTANCE;
 
 		int enemy_type = (rand() % 2) + 1;
+		Enemy* enemy = new Enemy(enemy_type);
 
-		enemy = new Enemy(enemy_type);
-		enemy->setCenter(origin);
+		enemy->setInitialPosition(player_pos + polar_pos);
+		enemy->moveTowards(player_pos);
 
-		enemy->setInitialPosition(player_pos + glm::vec2(x, y));
-
-		enemy->setMoveDirection(player_pos);
 		float speedCuantifier = (float)(rand() % 3 + 1);
 
 		enemy->x_speed *= speedCuantifier;
 		enemy->y_speed *= speedCuantifier;
-
 
 		enemies.push_back(enemy);
 	}
@@ -437,6 +430,7 @@ void Scene2D::spawnPowerup() {
 	powerups.push_back(powerup);
 
 }
+
 
 
 

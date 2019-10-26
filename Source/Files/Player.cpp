@@ -54,6 +54,11 @@ void Player::collideWith(Player& player) {
 	// No collision possible between two players ...
 }
 
+bool Player::isDead(void) const
+{
+	return (this->lives_left <= 0);
+}
+
 void Player::takeDamage(int damage) {
 	this->lives_left -= damage;
 	if (this->lives_left <= 0) {

@@ -1,9 +1,10 @@
 #include "GameObject.h"
 #include "Transform2D.h"
+#include "constants.h"
 
 GameObject::GameObject() {
 	this->mesh_name = "";
-	this->center = glm::vec3();
+	this->center = origin;
 	this->size = 0.0f;
 	this->color = glm::vec3();
 	this->rotation = 0.0f;
@@ -35,16 +36,18 @@ bool GameObject::collidesWith(GameObject* other) {
 	return collides;
 }
 
-void GameObject::setMoveDirection(glm::vec2 target) {
+void GameObject::moveTowards(glm::vec2 &target) {
+	
 	float dx = target.x - tx;
 	float dy = target.y - ty;
-	float dist = sqrt(dx*dx + dy*dy);
-	float steps = dist / 0.5f;
-	float xspeed = dx / steps;
-	float yspeed = dy / steps;
 
-	x_speed = xspeed;
-	y_speed = yspeed;
+	float dist = sqrt(dx*dx + dy*dy);
+
+	float steps = dist / 0.5f;
+
+	x_speed = dx / steps;
+	y_speed = dy / steps;
+
 	rotation = atan(dy / dx);
 }
 

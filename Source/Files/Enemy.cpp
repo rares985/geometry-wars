@@ -4,8 +4,6 @@
 #include "Projectile.h"
 #include <iostream>
 
-
-
 Enemy::Enemy(int enemy_type) {
 	if (enemy_type == 1) {
 		this->mesh_name = "weak_enemy_ship";
@@ -18,6 +16,7 @@ Enemy::Enemy(int enemy_type) {
 	this->setSize(DEFAULT_ENEMY_SIZE);
 	this->initial_lives = enemy_type; /* Ugly hack, TODO remove */
 	this->lives_left = this->initial_lives;
+
 }
 
 Enemy::~Enemy() {
@@ -55,6 +54,12 @@ void Enemy::collideWith(Player& player)
 
 	/* Die */
 	this->takeDamage(this->lives_left);
+}
+
+void Enemy::performShrink(float deltaTimeSeconds)
+{
+	if (this->scale > 0.75f)
+		this->scale -= (0.5f * deltaTimeSeconds) / SHRINK_ANIMATION_DURATION; /* and it shrinks over 250ms to half size */
 }
 
 void Enemy::takeDamage(int damage)

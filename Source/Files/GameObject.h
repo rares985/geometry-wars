@@ -34,7 +34,7 @@ class GameObject {
 		glm::mat3 model_matrix = glm::mat3();
 
 
-		void setMoveDirection(glm::vec2 target);
+		void moveTowards(glm::vec2 &target);
 
 		void setSize(float size) { this->size = size; };
 		void setScale(float scale) { this->scale = scale; };

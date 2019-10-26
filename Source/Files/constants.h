@@ -15,6 +15,7 @@
 #define FREEZE_POWERUP_SIZE 0.15f
 
 #define ENEMY_SPAWN_DISTANCE 6.0f
+#define ENEMIES_SPAWNED_PER_ROUND 3
 
 
 /* various durations*/

@@ -22,7 +22,15 @@ GameInstance::GameInstance() {
 }
 
 GameInstance::~GameInstance() {
-
+	for (auto obj : enemies) {
+		delete obj;
+	}
+	for (auto obj : powerups) {
+		delete obj;
+	}
+	for (auto obj : projectiles) {
+		delete obj;
+	}
 }
 
 void GameInstance::updateScore(int diff) {
@@ -95,7 +103,7 @@ void GameInstance::spawnEnemies() {
 
 		enemy->setInitialPosition(player_pos + glm::vec2(x, y));
 
-		enemy->setMoveDirection(player_pos);
+		enemy->moveTowards(player_pos);
 		float speedCuantifier = (float)(rand() % 3 + 1);
 
 		enemy->x_speed *= speedCuantifier;

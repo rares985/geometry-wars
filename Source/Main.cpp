@@ -13,7 +13,7 @@ using namespace std;
 int main(int argc, char **argv)
 {
 	/* Seed the RNG */
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 	
 	
 	WindowProperties wp;
