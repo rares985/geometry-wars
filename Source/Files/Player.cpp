@@ -11,7 +11,7 @@ Player::Player() {
 	this->setSize(PLAYER_SIZE);
 	this->setColor(ivory);
 
-	this->mesh_name = "player_ship";
+	this->mesh_name = PLAYER_SHIP_MESH_NAME;
 	this->center = origin;
 
 	this->lives_left = 3;

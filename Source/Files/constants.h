@@ -5,6 +5,16 @@
 
 #include "Core/Engine.h"
 
+/* Mesh names */
+#define PLAYER_SHIP_MESH_NAME			"player_ship"
+#define PROJECTILE_MESH_NAME			"projectile"
+#define WEAK_ENEMY_SHIP_MESH_NAME		"weak_enemy_ship"
+#define STRONG_ENEMY_SHIP_MESH_NAME		"strong_enemy_ship"
+#define SHRINKED_ENEMY_SHIP_MESH_NAME	"shrinked_enemy_ship"
+#define LIVES_INDICATOR_MESH_NAME		"lives"
+#define LIFE_POWERUP_MESH_NAME			"life"
+#define FREEZE_POWERUP_MESH_NAME		"freeze"
+
 /* various mesh sizes */
 #define PLAYER_SIZE					0.4f
 #define PROJECTILE_SIZE				0.1f

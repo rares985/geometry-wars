@@ -3,7 +3,7 @@
 #include <iostream>
 
 Projectile::Projectile() {
-	this->mesh_name = "projectile";
+	this->mesh_name = PROJECTILE_MESH_NAME;
 	this->setSize(PROJECTILE_SIZE);
 	this->setCenter(origin);
 	this->setColor(yellow);

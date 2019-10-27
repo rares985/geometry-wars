@@ -7,11 +7,11 @@
 
 Enemy::Enemy(int enemy_type) {
 	if (enemy_type == 1) {
-		this->mesh_name = "weak_enemy_ship";
+		this->mesh_name = WEAK_ENEMY_SHIP_MESH_NAME;
 		this->setColor(deepskyblue);
 	}
 	else {
-		this->mesh_name = "strong_enemy_ship";
+		this->mesh_name = STRONG_ENEMY_SHIP_MESH_NAME;
 		this->setColor(gold);
 	}
 	this->setSize(DEFAULT_ENEMY_SIZE);
@@ -64,7 +64,7 @@ void Enemy::performShrink(float deltaTimeSeconds)
 	}
 
 	/* Doubles speed a LOT of times but only this way is it noticeable */
-	this->setMeshName("shrinked_enemy_ship");
+	this->setMeshName(SHRINKED_ENEMY_SHIP_MESH_NAME);
 	this->x_speed *= 2;
 	this->y_speed *= 2;
 	this->setColor(firebrick);
