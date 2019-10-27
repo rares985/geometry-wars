@@ -57,6 +57,7 @@ private:
 
 	void		OnInputUpdate(float deltaTime, int mods) override;	
 	void		OnMouseBtnPress(int mouseX, int mouseY, int button, int mods) override;
+	void		OnKeyPress(int key, int mods) override;
 	
 		
 	glm::mat3	VisualizationTransf2DUnif(const LogicSpace &logicSpace, const ViewportSpace &viewSpace);

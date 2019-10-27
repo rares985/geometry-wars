@@ -14,8 +14,9 @@ enum class GameState {
 	GS_NOT_STARTED	= 0,
 	GS_RUNNING		= 1,
 	GS_FROZEN		= 2,
-	GS_ENDED		= 3,
-	GS_INVALID		= 4
+	GS_PAUSED		= 3,
+	GS_ENDED		= 4,
+	GS_INVALID		= 5
 };
 
 class GameInstance {
@@ -35,9 +36,13 @@ public:
 	bool		isFrozen(void) const { return game_state == GameState::GS_FROZEN; };
 	bool		isEndGame(void) const { return game_state == GameState::GS_ENDED; };
 	bool		isRunning(void) const { return game_state == GameState::GS_RUNNING; };
+	bool		isPaused(void) const { return game_state == GameState::GS_PAUSED; };
 
 	void		freezeGame(void) { game_state = GameState::GS_FROZEN; freeze_timer = 0; };
 	void		unfreezeGame(void) { game_state = GameState::GS_RUNNING; freeze_timer = 0; };
+
+	void		pauseGame(void) { game_state = GameState::GS_PAUSED; };
+	void		resumeGame(void) { game_state = GameState::GS_RUNNING; };
 
 	void		deleteInvisibleEntities();
 

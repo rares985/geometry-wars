@@ -1,6 +1,13 @@
 # geometry-wars
 OpenGL 2D space shooter with several powerups
 
+## Howto
+Use WASD or arrows to move, Mouse to shoot.
+
+P - Pause
+R - Resume
+V - Spawn Powerup (only for testing atm, will be removed)
+
 
 ## Powerups
 

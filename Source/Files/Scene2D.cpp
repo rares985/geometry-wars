@@ -141,6 +141,10 @@ void Scene2D::Update(float deltaTimeSeconds) {
 			freezeScreen(vis_matrix);
 			break;
 
+		case GameState::GS_PAUSED:
+			freezeScreen(vis_matrix);
+			break;
+
 		case GameState::GS_FROZEN:
 			game_instance->freeze_timer += deltaTimeSeconds;
 
@@ -246,54 +250,69 @@ void Scene2D::RenderLivesIndicator(int how_many)
 
 void Scene2D::OnInputUpdate(float deltaTime, int mods) {
 
-	Player& player = *(game_instance->player);
+	if (!game_instance->isPaused()) {
 
-	float x_cuantif = 0.0f;
-	float y_cuantif = 0.0f;
+		Player& player = *(game_instance->player);
 
-	if (window->KeyHold(GLFW_KEY_W) || window->KeyHold(GLFW_KEY_UP)) {
-		y_cuantif += 3 * deltaTime;
+		float x_cuantif = 0.0f;
+		float y_cuantif = 0.0f;
+
+		if (window->KeyHold(GLFW_KEY_W) || window->KeyHold(GLFW_KEY_UP)) {
+			y_cuantif += 3 * deltaTime;
+		}
+		else if (window->KeyHold(GLFW_KEY_S) || window->KeyHold(GLFW_KEY_DOWN)) {
+			y_cuantif -= 3 * deltaTime;
+		}
+		if (window->KeyHold(GLFW_KEY_A) || window->KeyHold(GLFW_KEY_LEFT)) {
+			x_cuantif += -3 * deltaTime;
+		}
+		else if (window->KeyHold(GLFW_KEY_D) || window->KeyHold(GLFW_KEY_RIGHT)) {
+			x_cuantif += 3 * deltaTime;
+		}
+
+		player.updatePosition(x_cuantif, y_cuantif);
+
+
+		glm::ivec2 mouse_pos = window->GetCursorPosition();
+
+		float logic_mouse_x = (float)(mouse_pos.x) / LOGIC_SCALE_FACTOR;
+		float logic_mouse_y = (float)(WINDOW_HEIGHT_PX - mouse_pos.y) / LOGIC_SCALE_FACTOR;
+
+		player.rotateTowards(glm::vec2(logic_mouse_x, logic_mouse_y));
 	}
-	else if (window->KeyHold(GLFW_KEY_S) || window->KeyHold(GLFW_KEY_DOWN)) {
-		y_cuantif -= 3 * deltaTime;
-	}
-	if (window->KeyHold(GLFW_KEY_A) || window->KeyHold(GLFW_KEY_LEFT)) {
-		x_cuantif += -3 * deltaTime;
-	}
-	else if (window->KeyHold(GLFW_KEY_D) || window->KeyHold(GLFW_KEY_RIGHT)) {
-		x_cuantif += 3 * deltaTime;
-	}
-	else if (window->KeyHold(GLFW_KEY_V)) {
-		game_instance->spawnPowerup(); // only for testing purposes
-	}
-
-	player.updatePosition(x_cuantif, y_cuantif);
-
-
-	glm::ivec2 mouse_pos = window->GetCursorPosition();
-
-	float logic_mouse_x = (float)(mouse_pos.x) / LOGIC_SCALE_FACTOR;
-	float logic_mouse_y = (float)(WINDOW_HEIGHT_PX - mouse_pos.y) / LOGIC_SCALE_FACTOR;
-
-	player.rotateTowards(glm::vec2(logic_mouse_x, logic_mouse_y));
 }
 
 void Scene2D::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods) {
 
-	Player& player = *(game_instance->player);
-	std::list<std::unique_ptr<Projectile>> &projectiles = game_instance->projectiles;
+	if (!game_instance->isPaused()) {
+		Player& player = *(game_instance->player);
+		std::list<std::unique_ptr<Projectile>> &projectiles = game_instance->projectiles;
 
-	if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_LEFT)) {
+		if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_LEFT)) {
 		
-		std::unique_ptr<Projectile> projectile(new Projectile());
+			std::unique_ptr<Projectile> projectile(new Projectile());
 
-		float logic_mouse_x = (float)(mouseX) / LOGIC_SCALE_FACTOR;
-		float logic_mouse_y = (float)(WINDOW_HEIGHT_PX - mouseY) / LOGIC_SCALE_FACTOR;
+			float logic_mouse_x = (float)(mouseX) / LOGIC_SCALE_FACTOR;
+			float logic_mouse_y = (float)(WINDOW_HEIGHT_PX - mouseY) / LOGIC_SCALE_FACTOR;
 
-		projectile->setInitialPosition(player.getPosition());
-		projectile->moveTowards(glm::vec2(logic_mouse_x, logic_mouse_y));
+			projectile->setInitialPosition(player.getPosition());
+			projectile->moveTowards(glm::vec2(logic_mouse_x, logic_mouse_y));
 	
-		projectiles.push_back(std::move(projectile));
+			projectiles.push_back(std::move(projectile));
+		}
+	}
+}
+
+void Scene2D::OnKeyPress(int key, int mods)
+{
+	if (key == GLFW_KEY_P) {
+		game_instance->pauseGame();
+	}
+	if (key == GLFW_KEY_R) {
+		game_instance->resumeGame();
+	}
+	if (key == GLFW_KEY_V) {
+		game_instance->spawnPowerup(); // only for testing purposes
 	}
 }
 
