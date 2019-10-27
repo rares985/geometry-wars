@@ -21,10 +21,10 @@ GameObject::~GameObject()
 	// de-allocate
 }
 
-bool GameObject::collidesWith(const GameObject &other) {
+bool GameObject::CollidesWith(const GameObject &other) {
 	bool objects_collide = false;
 
-	if (visible && other.isVisible()) {
+	if (visible && other.IsVisible()) {
 
 		glm::vec2 dist = glm::vec2(tx, ty) - other.getPosition();
 
@@ -38,7 +38,7 @@ bool GameObject::collidesWith(const GameObject &other) {
 	return objects_collide;
 }
 
-void GameObject::moveTowards(const glm::vec2 &target) {
+void GameObject::MoveTowards(const glm::vec2 &target) {
 	
 	float dx = target.x - tx;
 	float dy = target.y - ty;
@@ -51,7 +51,7 @@ void GameObject::moveTowards(const glm::vec2 &target) {
 	rotation = glm::atan(dy, dx);
 }
 
-void GameObject::computeModelMatrix(const glm::mat3 &vis_matrix)
+void GameObject::ComputeModelMatrix(const glm::mat3 &vis_matrix)
 {
 	this->model_matrix = vis_matrix;
 	this->model_matrix *= Transform2D::Translate(tx, ty);

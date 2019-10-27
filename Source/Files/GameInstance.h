@@ -25,26 +25,26 @@ public:
 	GameInstance();
 	~GameInstance();
 
-	void		updateScore(int diff);
-	void		updateTimers(float deltaTimeSeconds);
+	void		UpdateScore(int diff);
+	void		UpdateTimers(float deltaTimeSeconds);
 
-	void		spawnEnemies();
-	void		spawnPowerup();
+	void		SpawnEnemies();
+	void		SpawnPowerup();
 
 	void		OnGameEnd(void) { game_state = GameState::GS_ENDED; };
 
-	bool		isFrozen(void) const { return game_state == GameState::GS_FROZEN; };
-	bool		isEndGame(void) const { return game_state == GameState::GS_ENDED; };
-	bool		isRunning(void) const { return game_state == GameState::GS_RUNNING; };
-	bool		isPaused(void) const { return game_state == GameState::GS_PAUSED; };
+	bool		IsFrozen(void) const { return game_state == GameState::GS_FROZEN; };
+	bool		IsEnded(void) const { return game_state == GameState::GS_ENDED; };
+	bool		IsRunning(void) const { return game_state == GameState::GS_RUNNING; };
+	bool		IsPaused(void) const { return game_state == GameState::GS_PAUSED; };
 
-	void		freezeGame(void) { game_state = GameState::GS_FROZEN; freeze_timer = 0; };
-	void		unfreezeGame(void) { game_state = GameState::GS_RUNNING; freeze_timer = 0; };
+	void		Freeze(void) { game_state = GameState::GS_FROZEN; freeze_timer = 0; };
+	void		Thaw(void) { game_state = GameState::GS_RUNNING; freeze_timer = 0; };
 
-	void		pauseGame(void) { game_state = GameState::GS_PAUSED; };
-	void		resumeGame(void) { game_state = GameState::GS_RUNNING; };
+	void		Pause(void) { game_state = GameState::GS_PAUSED; };
+	void		Resume(void) { game_state = GameState::GS_RUNNING; };
 
-	void		deleteInvisibleEntities();
+	void		EraseInvisibleEntities();
 
 	GameState	getGameState() const { return game_state; };
 

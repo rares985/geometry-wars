@@ -29,7 +29,7 @@ class GameObject {
 		glm::mat3		model_matrix = glm::mat3();
 
 
-		void			moveTowards(const glm::vec2 &target);
+		void			MoveTowards(const glm::vec2 &target);
 
 		void			setSize(float size) { this->size = size; };
 		void			setScale(float scale) { this->scale = scale; };
@@ -38,13 +38,13 @@ class GameObject {
 		void			setMeshName(std::string mesh_name) { this->mesh_name = mesh_name; };
 		void			setColor(glm::vec3 color) { this->color = color; };
 		void			setCenter(glm::vec3 center) { this->center = center; };
-		void			rotateTowards(glm::vec2 target) { this->rotation = atan((target.y - ty) / (target.x - tx)); };
-		void			makeInvisible(void) { this->visible = false; };
+		void			RotateTowards(glm::vec2 target) { this->rotation = glm::atan(target.y - ty , target.x - tx); };
+		void			MakeInvisible(void) { this->visible = false; };
 
 
-		bool			isVisible(void) const { return this->visible; };
+		bool			IsVisible(void) const { return this->visible; };
 
-		void			computeModelMatrix(const glm::mat3 &vis_matrix);
+		void			ComputeModelMatrix(const glm::mat3 &vis_matrix);
 
 		int				getLivesLeft() const { return this->lives_left; };
 		float			getSize() const { return this->size; };
@@ -55,12 +55,12 @@ class GameObject {
 		glm::vec3		getCenter() const { return this->center; };
 		glm::mat3&		getModelMatrix() { return this->model_matrix; };
 
-		bool			collidesWith(const GameObject &other);
+		bool			CollidesWith(const GameObject &other);
 
-		virtual void	handleCollisionWith(Player&		player)		= 0;
-		virtual void	handleCollisionWith(Projectile& projectile) = 0;
-		virtual void	handleCollisionWith(Enemy&		enemy)		= 0;
-		virtual void	handleCollisionWith(Powerup&	powerup)	= 0;
+		virtual void	HandleCollisionWith(Player&		player)		= 0;
+		virtual void	HandleCollisionWith(Projectile& projectile) = 0;
+		virtual void	HandleCollisionWith(Enemy&		enemy)		= 0;
+		virtual void	HandleCollisionWith(Powerup&	powerup)	= 0;
 
 private:
 	float				size;

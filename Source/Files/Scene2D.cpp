@@ -138,11 +138,11 @@ void Scene2D::Update(float deltaTimeSeconds) {
 			if (background_color.x <= 1.0f) {
 				background_color += glm::vec3(deltaTimeSeconds / 2.0f, 0, 0);
 			}
-			freezeScreen(vis_matrix);
+			DrawScreenFrozen(vis_matrix);
 			break;
 
 		case GameState::GS_PAUSED:
-			freezeScreen(vis_matrix);
+			DrawScreenFrozen(vis_matrix);
 			break;
 
 		case GameState::GS_FROZEN:
@@ -153,16 +153,16 @@ void Scene2D::Update(float deltaTimeSeconds) {
 			break;
 	}
 
-	game_instance->updateTimers(deltaTimeSeconds);
+	game_instance->UpdateTimers(deltaTimeSeconds);
 }
 
 void Scene2D::FrameEnd()
 {
 	Player &player = *(game_instance->player);
 
-	game_instance->deleteInvisibleEntities();
+	game_instance->EraseInvisibleEntities();
 
-	if (player.isDead()) {
+	if (player.IsDead()) {
 		game_instance->OnGameEnd();
 	}
 }
@@ -175,7 +175,7 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 	std::list<std::unique_ptr<Powerup>>& powerups = game_instance->powerups;
 	
 	/* render the player's ship */
-	player.computeModelMatrix(vis_matrix);
+	player.ComputeModelMatrix(vis_matrix);
 	RenderMesh2D(meshes[player.getMeshName()],shaders["VertexColor"],player.getModelMatrix());
 	
 	/* Render projectiles and check for enemy-projectile collision */
@@ -183,15 +183,15 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 	std::list<std::unique_ptr<Projectile>>::iterator proj_it;
 
 	for (proj_it = projectiles.begin(); proj_it != projectiles.end(); proj_it++) {
-		(*proj_it)->updatePosition(24 * deltaTimeSeconds);
-		(*proj_it)->computeModelMatrix(vis_matrix);
+		(*proj_it)->UpdatePosition(24 * deltaTimeSeconds);
+		(*proj_it)->ComputeModelMatrix(vis_matrix);
 		for (enemy_it = enemies.begin(); enemy_it != enemies.end(); enemy_it++) {
-			if ((*enemy_it)->collidesWith(**proj_it)) {
-				(*enemy_it)->handleCollisionWith(**proj_it);
+			if ((*enemy_it)->CollidesWith(**proj_it)) {
+				(*enemy_it)->HandleCollisionWith(**proj_it);
 				// game_instance->updateScore(enemy->initial_lives);
 			}
 		}
-		renderIfVisible(**proj_it);
+		RenderObject(**proj_it);
 		
 	}
 
@@ -199,36 +199,36 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 	/* Render enemies and check for enemy-player collision */
 	for (enemy_it = enemies.begin(); enemy_it != enemies.end(); enemy_it++) {
 		/* Make the enemy move towards the player */
-		(*enemy_it)->moveTowards(player.getPosition());
+		(*enemy_it)->MoveTowards(player.getPosition());
 
 		if ((*enemy_it)->shrink) { /* if the enemy is strong and has been hit, the speed doubles */
-			(*enemy_it)->performShrink(deltaTimeSeconds);
+			(*enemy_it)->PerformShrink(deltaTimeSeconds);
 		}
 
-		if (player.collidesWith(**enemy_it)) {
-			player.handleCollisionWith(**enemy_it);
+		if (player.CollidesWith(**enemy_it)) {
+			player.HandleCollisionWith(**enemy_it);
 		}
 
-		if (!game_instance->isFrozen()) {
-			(*enemy_it)->updatePosition(deltaTimeSeconds);
-			(*enemy_it)->computeModelMatrix(vis_matrix);
+		if (!game_instance->IsFrozen()) {
+			(*enemy_it)->UpdatePosition(deltaTimeSeconds);
+			(*enemy_it)->ComputeModelMatrix(vis_matrix);
 		}
 
-		renderIfVisible(**enemy_it);
+		RenderObject(**enemy_it);
 	}
 
 	/* Draw powerups */
 	std::list<std::unique_ptr<Powerup>>::iterator it;
 	for (it = powerups.begin(); it != powerups.end(); it++) {
-		(*it)->computeModelMatrix(vis_matrix);
+		(*it)->ComputeModelMatrix(vis_matrix);
 		/* Check for collision with player */
-		if (player.collidesWith(**it)) {
-			player.handleCollisionWith(**it);
+		if (player.CollidesWith(**it)) {
+			player.HandleCollisionWith(**it);
 			if ((*it)->getMeshName() == FREEZE_POWERUP_MESH_NAME) {
-				game_instance->freezeGame();
+				game_instance->Freeze();
 			}
 		}
-		renderIfVisible(**it);
+		RenderObject(**it);
 	}
 
 	/* Draw lives indicator */
@@ -250,7 +250,7 @@ void Scene2D::RenderLivesIndicator(int how_many)
 
 void Scene2D::OnInputUpdate(float deltaTime, int mods) {
 
-	if (!game_instance->isPaused()) {
+	if (!game_instance->IsPaused()) {
 
 		Player& player = *(game_instance->player);
 
@@ -270,7 +270,7 @@ void Scene2D::OnInputUpdate(float deltaTime, int mods) {
 			x_cuantif += 3 * deltaTime;
 		}
 
-		player.updatePosition(x_cuantif, y_cuantif);
+		player.UpdatePosition(x_cuantif, y_cuantif);
 
 
 		glm::ivec2 mouse_pos = window->GetCursorPosition();
@@ -278,13 +278,13 @@ void Scene2D::OnInputUpdate(float deltaTime, int mods) {
 		float logic_mouse_x = (float)(mouse_pos.x) / LOGIC_SCALE_FACTOR;
 		float logic_mouse_y = (float)(WINDOW_HEIGHT_PX - mouse_pos.y) / LOGIC_SCALE_FACTOR;
 
-		player.rotateTowards(glm::vec2(logic_mouse_x, logic_mouse_y));
+		player.RotateTowards(glm::vec2(logic_mouse_x, logic_mouse_y));
 	}
 }
 
 void Scene2D::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods) {
 
-	if (!game_instance->isPaused()) {
+	if (!game_instance->IsPaused()) {
 		Player& player = *(game_instance->player);
 		std::list<std::unique_ptr<Projectile>> &projectiles = game_instance->projectiles;
 
@@ -296,7 +296,7 @@ void Scene2D::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods) {
 			float logic_mouse_y = (float)(WINDOW_HEIGHT_PX - mouseY) / LOGIC_SCALE_FACTOR;
 
 			projectile->setInitialPosition(player.getPosition());
-			projectile->moveTowards(glm::vec2(logic_mouse_x, logic_mouse_y));
+			projectile->MoveTowards(glm::vec2(logic_mouse_x, logic_mouse_y));
 	
 			projectiles.push_back(std::move(projectile));
 		}
@@ -306,18 +306,18 @@ void Scene2D::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods) {
 void Scene2D::OnKeyPress(int key, int mods)
 {
 	if (key == GLFW_KEY_P) {
-		game_instance->pauseGame();
+		game_instance->Pause();
 	}
 	if (key == GLFW_KEY_R) {
-		game_instance->resumeGame();
+		game_instance->Resume();
 	}
 	if (key == GLFW_KEY_V) {
-		game_instance->spawnPowerup(); // only for testing purposes
+		game_instance->SpawnPowerup(); // only for testing purposes
 	}
 }
 
 
-void Scene2D::freezeScreen(glm::mat3 vis_matrix) {
+void Scene2D::DrawScreenFrozen(glm::mat3 vis_matrix) {
 
 	Player& player = *(game_instance->player);
 	std::list<std::unique_ptr<Projectile>> &projectiles = game_instance->projectiles;
@@ -330,20 +330,20 @@ void Scene2D::freezeScreen(glm::mat3 vis_matrix) {
 	/* render enemies */
 	std::list<std::unique_ptr<Enemy>>::iterator enemy_it;
 	for (enemy_it = enemies.begin(); enemy_it != enemies.end(); enemy_it++) {
-		renderIfVisible(**enemy_it);
+		RenderObject(**enemy_it);
 	}
 
 	/* Render projectiles */
 	std::list<std::unique_ptr<Projectile>>::iterator proj_it;
 	for (proj_it = projectiles.begin(); proj_it != projectiles.end(); proj_it++) {
-		renderIfVisible(**proj_it);
+		RenderObject(**proj_it);
 	}
 
 	/* render powerups */
 	std::list<std::unique_ptr<Powerup>>::iterator pow_it;
 	for (pow_it = powerups.begin(); pow_it != powerups.end(); pow_it++) {
-		(*pow_it)->computeModelMatrix(vis_matrix);
-		renderIfVisible(**pow_it);
+		(*pow_it)->ComputeModelMatrix(vis_matrix);
+		RenderObject(**pow_it);
 	}
 
 	/*render lives indicator */
@@ -357,9 +357,9 @@ void Scene2D::freezeScreen(glm::mat3 vis_matrix) {
 	}
 }
 
-void Scene2D::renderIfVisible(GameObject &object)
+void Scene2D::RenderObject(GameObject &object)
 {
-	if (object.isVisible()) {
+	if (object.IsVisible()) {
 		RenderMesh2D(meshes[object.getMeshName()], shaders["VertexColor"], object.getModelMatrix());
 	}
 }

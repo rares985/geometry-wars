@@ -22,26 +22,26 @@ Player::~Player() {
 	// deconstruct player class... 
 }
 
-void Player::updatePosition(float x_cuantif, float y_cuantif) {
+void Player::UpdatePosition(float x_cuantif, float y_cuantif) {
 	this->tx += x_cuantif;
 	this->ty += y_cuantif;
 }
 
-void Player::handleCollisionWith(Enemy& enemy) {
+void Player::HandleCollisionWith(Enemy& enemy) {
 	/* take Damage */
-	this->takeDamage(enemy.getLivesLeft());
+	this->TakeDamage(enemy.getLivesLeft());
 
 	/* Notify enemy that it collided with us, it will take damage */
-	enemy.handleCollisionWith(*this);
+	enemy.HandleCollisionWith(*this);
 }
 
-void Player::handleCollisionWith(Projectile& enemy) {
+void Player::HandleCollisionWith(Projectile& enemy) {
 	// no collision possible between player and projectile...
 }
 
-void Player::handleCollisionWith(Powerup& powerup) {
+void Player::HandleCollisionWith(Powerup& powerup) {
 	/* Notify powerup that it collided with us...will apply an efect */
-	powerup.handleCollisionWith(*this);
+	powerup.HandleCollisionWith(*this);
 
 	/* Apply effect -- TODO freeze from here */
 	if (powerup.getMeshName() == "life") {
@@ -50,16 +50,16 @@ void Player::handleCollisionWith(Powerup& powerup) {
 
 }
 
-void Player::handleCollisionWith(Player& player) {
+void Player::HandleCollisionWith(Player& player) {
 	// No collision possible between two players ...
 }
 
-bool Player::isDead(void) const
+bool Player::IsDead(void) const
 {
 	return (this->lives_left <= 0);
 }
 
-void Player::takeDamage(int damage) {
+void Player::TakeDamage(int damage) {
 	this->lives_left -= damage;
 	if (this->lives_left <= 0) {
 		this->visible = 0;

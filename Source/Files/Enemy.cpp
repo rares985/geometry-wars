@@ -24,40 +24,40 @@ Enemy::~Enemy() {
 
 }
 
-void Enemy::updatePosition(float speed_cuantif)
+void Enemy::UpdatePosition(float speed_cuantif)
 {
 	this->tx += this->x_speed * speed_cuantif;
 	this->ty += this->y_speed * speed_cuantif;
 }
 
-void Enemy::handleCollisionWith(Enemy& enemy)
+void Enemy::HandleCollisionWith(Enemy& enemy)
 {
 	// No collision possible between enemies...
 }
 
-void Enemy::handleCollisionWith(Projectile& projectile)
+void Enemy::HandleCollisionWith(Projectile& projectile)
 {
 	/* notify projectile that it collided with us */
-	projectile.handleCollisionWith(*this);
+	projectile.HandleCollisionWith(*this);
 
 	/* take damage */
-	this->takeDamage(1);
+	this->TakeDamage(1);
 }
 
-void Enemy::handleCollisionWith(Powerup& powerup)
+void Enemy::HandleCollisionWith(Powerup& powerup)
 {
 	// No collision possible between enemy and powerup...
 }
 
-void Enemy::handleCollisionWith(Player& player)
+void Enemy::HandleCollisionWith(Player& player)
 {
 	/* notified by player, only take damage */
 
 	/* Die */
-	this->takeDamage(this->lives_left);
+	this->TakeDamage(this->lives_left);
 }
 
-void Enemy::performShrink(float deltaTimeSeconds)
+void Enemy::PerformShrink(float deltaTimeSeconds)
 {
 	if (this->scale > 0.75f) {
 		this->scale -= (0.5f * deltaTimeSeconds) / SHRINK_ANIMATION_DURATION; /* and it shrinks over 250ms to half size */
@@ -70,7 +70,7 @@ void Enemy::performShrink(float deltaTimeSeconds)
 	this->setColor(firebrick);
 }
 
-void Enemy::takeDamage(int damage)
+void Enemy::TakeDamage(int damage)
 {
 	this->lives_left -= damage;
 

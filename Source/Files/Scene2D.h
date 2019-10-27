@@ -63,13 +63,13 @@ private:
 	glm::mat3	VisualizationTransf2DUnif(const LogicSpace &logicSpace, const ViewportSpace &viewSpace);
 	void		SetViewportArea(const ViewportSpace &viewSpace, glm::vec3 colorColor = glm::vec3(0), bool clear = true);
 
-	void		freezeScreen(glm::mat3 vis_matrix);
-	void		renderIfVisible(GameObject &object);
+	void		DrawScreenFrozen(glm::mat3 vis_matrix);
+	void		RenderObject(GameObject &object);
 
 protected:
 	
-	glm::mat3						vis_matrix;
-	glm::vec3						background_color;
+	glm::mat3							vis_matrix;
+	glm::vec3							background_color;
 
 	std::unique_ptr<ViewportSpace>		view_space_ptr;
 	std::unique_ptr<LogicSpace>			logic_space_ptr;

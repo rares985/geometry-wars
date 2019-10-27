@@ -22,15 +22,15 @@ GameInstance::~GameInstance() {
 
 }
 
-void GameInstance::updateScore(int diff) {
+void GameInstance::UpdateScore(int diff) {
 	this->score += diff;
 
 	printf("Score: %llu\n", this->score);
 }
 
-void GameInstance::updateTimers(float deltaTimeSeconds) {
+void GameInstance::UpdateTimers(float deltaTimeSeconds) {
 
-	if (isRunning()) {
+	if (IsRunning()) {
 		enemy_spawn_timer += deltaTimeSeconds;
 		powerup_spawn_timer += deltaTimeSeconds;
 
@@ -44,24 +44,24 @@ void GameInstance::updateTimers(float deltaTimeSeconds) {
 
 		/* Enemies spawn every spawn_threshold seconds*/
 		if (enemy_spawn_timer > enemy_spawn_threshold) {
-			spawnEnemies();
+			SpawnEnemies();
 			enemy_spawn_timer = 0;
 		}
 
 		/* Powerups spawn every 10 seconds */
 		if (powerup_spawn_timer > POWERUP_SPAWN_THRESHOLD) {
 			powerup_spawn_timer = 0;
-			spawnPowerup();
+			SpawnPowerup();
 		}
 	}
 
 	/* If freeze is over, reset the timer */
 	if (freeze_timer > FREEZE_DURATION) {
-		unfreezeGame();
+		Thaw();
 	}
 }
 
-void GameInstance::spawnEnemies() {
+void GameInstance::SpawnEnemies() {
 	for (int i = 0; i < ENEMIES_SPAWNED_PER_ROUND; i++) {
 
 		float angle = (float)rand();
@@ -75,7 +75,7 @@ void GameInstance::spawnEnemies() {
 		std::unique_ptr<Enemy> enemy(new Enemy(enemy_type));
 
 		enemy->setInitialPosition(player_pos + polar_pos);
-		enemy->moveTowards(player_pos);
+		enemy->MoveTowards(player_pos);
 
 		float speedCuantifier = (float)(rand() % 3 + 1);
 
@@ -86,7 +86,7 @@ void GameInstance::spawnEnemies() {
 	}
 }
 
-void GameInstance::spawnPowerup() {
+void GameInstance::SpawnPowerup() {
 
 	int powerup_type = (rand() % 2 + 1);
 
@@ -101,7 +101,7 @@ void GameInstance::spawnPowerup() {
 	powerups.push_back(std::move(powerup));
 }
 
-void GameInstance::deleteInvisibleEntities()
+void GameInstance::EraseInvisibleEntities()
 {
 	glm::vec2 low(0, 0);
 	glm::vec2 high(LOGIC_WINDOW_WIDTH, LOGIC_WINDOW_HEIGHT);
@@ -112,12 +112,12 @@ void GameInstance::deleteInvisibleEntities()
 	for (it = projectiles.begin(); it != projectiles.end(); it++) {
 		pos = (*it)->getPosition();
 		if (glm::any(glm::lessThan(pos, low)) || glm::any(glm::greaterThan(pos, high))) {
-			(*it)->makeInvisible();
+			(*it)->MakeInvisible();
 		}
 	}
 
-	projectiles.remove_if([](const std::unique_ptr<Projectile>& proj) { return !(*proj).isVisible(); });
-	enemies.remove_if([](const std::unique_ptr <Enemy> &enemy) { return !(*enemy).isVisible();  });
-	powerups.remove_if([](const std::unique_ptr<Powerup> &powerup) {return !(*powerup).isVisible(); });
+	projectiles.remove_if([](const std::unique_ptr<Projectile>& proj) { return !(*proj).IsVisible(); });
+	enemies.remove_if([](const std::unique_ptr <Enemy> &enemy) { return !(*enemy).IsVisible();  });
+	powerups.remove_if([](const std::unique_ptr<Powerup> &powerup) {return !(*powerup).IsVisible(); });
 
 }
