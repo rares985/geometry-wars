@@ -55,7 +55,7 @@ class GameObject {
 		glm::vec3		getCenter() const { return this->center; };
 		glm::mat3&		getModelMatrix() { return this->model_matrix; };
 
-		bool			collidesWith(const GameObject* other);
+		bool			collidesWith(const GameObject &other);
 
 		virtual void	handleCollisionWith(Player&		player)		= 0;
 		virtual void	handleCollisionWith(Projectile& projectile) = 0;

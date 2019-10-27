@@ -17,7 +17,8 @@ using namespace std;
 
 Scene2D::Scene2D()
 {
-	game_instance = new GameInstance();
+	game_instance = std::unique_ptr<GameInstance>(new GameInstance());
+
 
 	/* define the logic space and width */
 	logic_space.x = 0;
@@ -31,8 +32,7 @@ Scene2D::Scene2D()
 
 Scene2D::~Scene2D()
 {
-	//delete player;
-	delete game_instance;
+
 }
 
 void Scene2D::Init()
@@ -92,7 +92,7 @@ glm::mat3 Scene2D::VisualizationTransf2DUnif(const LogicSpace & logic_space, con
 		0.0f, 0.0f, 1.0f));
 }
 
-void Scene2D::SetViewportArea(const ViewportSpace & view_space, glm::vec3 colorColor, bool clear)
+void Scene2D::SetViewportArea(const ViewportSpace & view_space, glm::vec3 clearing_color, bool clear)
 {
 	glViewport(view_space.x, view_space.y, view_space.width, view_space.height);
 
@@ -100,7 +100,7 @@ void Scene2D::SetViewportArea(const ViewportSpace & view_space, glm::vec3 colorC
 	glScissor(view_space.x, view_space.y, view_space.width, view_space.height);
 
 	
-	glClearColor(colorColor.r, colorColor.g, colorColor.b, 1);
+	glClearColor(clearing_color.r, clearing_color.g, clearing_color.b, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_SCISSOR_TEST);
 
@@ -180,7 +180,7 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 
 		/* check for enemy-projectile collision */
 		for (auto enemy : enemies) {
-			if (enemy->collidesWith(proj)) {
+			if (enemy->collidesWith(*proj)) {
 				enemy->handleCollisionWith(*proj);
 				// game_instance->updateScore(enemy->initial_lives);
 			}
@@ -199,7 +199,7 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 			enemy->performShrink(deltaTimeSeconds);
 		}
 
-		if (player.collidesWith(enemy)) {
+		if (player.collidesWith(*enemy)) {
 			player.handleCollisionWith(*enemy);
 		}
 
@@ -215,7 +215,7 @@ void Scene2D::DrawScene(glm::mat3 vis_matrix, float deltaTimeSeconds)
 
 		powerup->computeModelMatrix(vis_matrix);
 
-		if (player.collidesWith(powerup)) {
+		if (player.collidesWith(*powerup)) {
 			player.handleCollisionWith(*powerup);
 			if (powerup->getMeshName() == "freeze") {
 				game_instance->freezeGame();
@@ -302,25 +302,16 @@ void Scene2D::freezeScreen(glm::mat3 vis_matrix) {
 	/*render enemies*/
 	for (auto enemy : enemies) {
 		renderIfVisible(*enemy);
-		//if (enemy->isVisible()) {
-			//RenderMesh2D([enemy->getMeshName()], shaders["VertexColor"], enemy->getModelMatrix());
-		//}
 	}
 	for (auto proj : projectiles) {
 		renderIfVisible(*proj);
-		//if (proj->isVisible()) {
-			//RenderMesh2D(meshes[proj->getMeshName()], shaders["VertexColor"], proj->getModelMatrix());
-		//}
+
 	}
 	/* render powerups */
 	for (auto powerup : powerups) {
 		powerup->computeModelMatrix(vis_matrix);
 
 		renderIfVisible(*powerup);
-
-		//if (powerup->isVisible()) {
-		//	RenderMesh2D(meshes[powerup->getMeshName()], shaders["VertexColor"], powerup->getModelMatrix());
-		//}
 	}
 	/*render projectiles*/
 	float tx = 16.0f;

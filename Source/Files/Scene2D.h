@@ -66,14 +66,14 @@ private:
 
 protected:
 	
-	glm::mat3		vis_matrix;
-	glm::vec3		background_color;
+	glm::mat3						vis_matrix;
+	glm::vec3						background_color;
 
-	ViewportSpace	view_space;
+	ViewportSpace					view_space;
 
-	LogicSpace		logic_space;
+	LogicSpace						logic_space;
 
-	GameInstance*	game_instance;
+	std::unique_ptr<GameInstance>	game_instance;
 };
 
 #endif /* SCENE_2D_H_ */

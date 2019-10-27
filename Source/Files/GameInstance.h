@@ -43,13 +43,13 @@ public:
 
 	GameState	getGameState() const { return game_state; };
 
-	float						freeze_timer;
+	float									freeze_timer;
 
-	Player*						player;
+	std::unique_ptr<Player>					player;
 
-	std::list<Enemy*>			enemies;
-	std::list<Projectile*>		projectiles;
-	std::list<Powerup*>			powerups;
+	std::list<Enemy*>						enemies;
+	std::list<Projectile*>					projectiles;
+	std::list<Powerup*>						powerups;
 
 private:
 	long long int				score;

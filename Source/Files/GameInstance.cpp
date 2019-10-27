@@ -14,7 +14,7 @@ GameInstance::GameInstance() {
 	this->powerup_spawn_threshold = 0.0f;
 	this->freeze_timer = 0.0f;
 
-	this->player = new Player();
+	this->player = std::unique_ptr<Player>(new Player());
 
 }
 

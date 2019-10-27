@@ -19,14 +19,12 @@ int main(int argc, char **argv)
 
 	WindowObject* window = Engine::Init(wp);
 
-	World *world = new Scene2D();
+	std::unique_ptr<World> world(new Scene2D());
 
 	world->Init();
 	world->Run();
 
 	Engine::Exit();
-
-	delete world;
 
 	return 0;
 }

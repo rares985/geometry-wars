@@ -21,16 +21,16 @@ GameObject::~GameObject()
 	// de-allocate
 }
 
-bool GameObject::collidesWith(const GameObject* other) {
+bool GameObject::collidesWith(const GameObject &other) {
 	bool objects_collide = false;
 
-	if (this->isVisible() && other->isVisible()) {
+	if (visible && other.isVisible()) {
 
-		glm::vec2 dist = getPosition() - other->getPosition();
+		glm::vec2 dist = glm::vec2(tx, ty) - other.getPosition();
 
 		float abs_dist = glm::dot(dist, dist);
 		
-		float radii_dist = (getSize() + other->getSize()) * (getSize() + other->getSize());
+		float radii_dist = (size + other.getSize()) * (size + other.getSize());
 
 		objects_collide = (abs_dist <= radii_dist);
 	}
