@@ -18,6 +18,7 @@ int main(int argc, char **argv)
 	wp.resolution = glm::ivec2(WINDOW_WIDTH_PX, WINDOW_HEIGHT_PX);
 
 	WindowObject* window = Engine::Init(wp);
+	window->SetVSync(true);
 
 	std::unique_ptr<World> world(new Scene2D());
 

@@ -19,15 +19,7 @@ GameInstance::GameInstance() {
 }
 
 GameInstance::~GameInstance() {
-	for (auto obj : enemies) {
-		delete obj;
-	}
-	for (auto obj : powerups) {
-		delete obj;
-	}
-	for (auto obj : projectiles) {
-		delete obj;
-	}
+
 }
 
 void GameInstance::updateScore(int diff) {
@@ -66,7 +58,6 @@ void GameInstance::updateTimers(float deltaTimeSeconds) {
 	/* If freeze is over, reset the timer */
 	if (freeze_timer > FREEZE_DURATION) {
 		unfreezeGame();
-		freeze_timer = 0;
 	}
 }
 
@@ -81,7 +72,7 @@ void GameInstance::spawnEnemies() {
 		polar_pos *= ENEMY_SPAWN_DISTANCE;
 
 		int enemy_type = (rand() % 2) + 1;
-		Enemy* enemy = new Enemy(enemy_type);
+		std::unique_ptr<Enemy> enemy(new Enemy(enemy_type));
 
 		enemy->setInitialPosition(player_pos + polar_pos);
 		enemy->moveTowards(player_pos);
@@ -91,7 +82,7 @@ void GameInstance::spawnEnemies() {
 		enemy->x_speed *= speedCuantifier;
 		enemy->y_speed *= speedCuantifier;
 
-		enemies.push_back(enemy);
+		enemies.push_back(std::move(enemy));
 	}
 }
 
@@ -102,12 +93,12 @@ void GameInstance::spawnPowerup() {
 	float x_pos = (float)(rand() % LOGIC_WINDOW_WIDTH);
 	float y_pos = (float)(rand() % LOGIC_WINDOW_HEIGHT);
 
-	Powerup* powerup = new Powerup(powerup_type);
+	std::unique_ptr<Powerup> powerup(new Powerup(powerup_type));
 
 	powerup->setCenter(origin);
 	powerup->setInitialPosition(x_pos, y_pos);
 
-	powerups.push_back(powerup);
+	powerups.push_back(std::move(powerup));
 }
 
 void GameInstance::deleteInvisibleEntities()
@@ -116,15 +107,17 @@ void GameInstance::deleteInvisibleEntities()
 	glm::vec2 high(LOGIC_WINDOW_WIDTH, LOGIC_WINDOW_HEIGHT);
 	glm::vec2 pos;
 
-	for (auto proj : projectiles) {
-		pos = proj->getPosition();
+	std::list<std::unique_ptr<Projectile>>::iterator it;
+
+	for (it = projectiles.begin(); it != projectiles.end(); it++) {
+		pos = (*it)->getPosition();
 		if (glm::any(glm::lessThan(pos, low)) || glm::any(glm::greaterThan(pos, high))) {
-			proj->makeInvisible();
+			(*it)->makeInvisible();
 		}
 	}
 
-	projectiles.remove_if([](const Projectile* proj) {return !proj->isVisible(); });
-	enemies.remove_if([](const Enemy* enemy) {return !enemy->isVisible(); });
-	powerups.remove_if([](const Powerup* powerup) {return !powerup->isVisible(); });
+	projectiles.remove_if([](const std::unique_ptr<Projectile>& proj) { return !(*proj).isVisible(); });
+	enemies.remove_if([](const std::unique_ptr <Enemy> &enemy) { return !(*enemy).isVisible();  });
+	powerups.remove_if([](const std::unique_ptr<Powerup> &powerup) {return !(*powerup).isVisible(); });
 
 }

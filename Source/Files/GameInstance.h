@@ -36,20 +36,20 @@ public:
 	bool		isEndGame(void) const { return game_state == GameState::GS_ENDED; };
 	bool		isRunning(void) const { return game_state == GameState::GS_RUNNING; };
 
-	void		freezeGame(void) { game_state = GameState::GS_FROZEN; };
-	void		unfreezeGame(void) { game_state = GameState::GS_RUNNING; };
+	void		freezeGame(void) { game_state = GameState::GS_FROZEN; freeze_timer = 0; };
+	void		unfreezeGame(void) { game_state = GameState::GS_RUNNING; freeze_timer = 0; };
 
 	void		deleteInvisibleEntities();
 
 	GameState	getGameState() const { return game_state; };
 
-	float									freeze_timer;
+	float													freeze_timer;
 
-	std::unique_ptr<Player>					player;
+	std::unique_ptr<Player>									player;
 
-	std::list<Enemy*>						enemies;
-	std::list<Projectile*>					projectiles;
-	std::list<Powerup*>						powerups;
+	std::list<std::unique_ptr<Enemy>>						enemies;
+	std::list<std::unique_ptr<Projectile>>					projectiles;
+	std::list<std::unique_ptr<Powerup>>						powerups;
 
 private:
 	long long int				score;

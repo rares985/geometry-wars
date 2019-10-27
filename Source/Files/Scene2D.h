@@ -53,6 +53,7 @@ private:
 	void		FrameEnd() override;
 
 	void		DrawScene(glm::mat3 visMatrix,float deltaTimeSeconds);
+	void		RenderLivesIndicator(int how_many);
 
 	void		OnInputUpdate(float deltaTime, int mods) override;	
 	void		OnMouseBtnPress(int mouseX, int mouseY, int button, int mods) override;
@@ -69,11 +70,10 @@ protected:
 	glm::mat3						vis_matrix;
 	glm::vec3						background_color;
 
-	ViewportSpace					view_space;
+	std::unique_ptr<ViewportSpace>		view_space_ptr;
+	std::unique_ptr<LogicSpace>			logic_space_ptr;
 
-	LogicSpace						logic_space;
-
-	std::unique_ptr<GameInstance>	game_instance;
+	std::unique_ptr<GameInstance>		game_instance;
 };
 
 #endif /* SCENE_2D_H_ */
