@@ -24,9 +24,11 @@ GameInstance::~GameInstance() {
 }
 
 void GameInstance::UpdateScore(int diff) {
-	this->score += diff;
 
-	printf("Score: %llu\n", this->score);
+	if (diff != 0) {
+		this->score += diff;
+		printf("Score: %llu\n", this->score);
+	}
 }
 
 void GameInstance::UpdateTimers(float deltaTimeSeconds) {
@@ -118,6 +120,8 @@ void GameInstance::EraseInvisibleEntities()
 			(*it)->MakeInvisible();
 		}
 	}
+
+	std::for_each(enemies.begin(), enemies.end(), [this](const std::unique_ptr < Enemy> & enemy) {UpdateScore(enemy->getScorePoints()); });
 
 	projectiles.remove_if([](const std::unique_ptr<Projectile>& proj) { return !(*proj).IsVisible(); });
 	enemies.remove_if([](const std::unique_ptr <Enemy> &enemy) { return !(*enemy).IsVisible();  });

@@ -5,20 +5,6 @@
 #include "Player.h"
 #include "Projectile.h"
 
-Enemy::Enemy(int enemy_type) {
-	if (enemy_type == 1) {
-		this->mesh_name = WEAK_ENEMY_SHIP_MESH_NAME;
-		this->color = deepskyblue;
-	}
-	else {
-		this->mesh_name = STRONG_ENEMY_SHIP_MESH_NAME;
-		this->setColor(gold);
-	}
-	this->setSize(DEFAULT_ENEMY_SIZE);
-	this->initial_lives = enemy_type; /* Ugly hack, TODO remove */
-	this->lives_left = this->initial_lives;
-}
-
 Enemy::Enemy(const std::string mesh_name, const glm::vec3& color, int initial_lives)
 {
 	this->mesh_name = mesh_name;
@@ -27,6 +13,7 @@ Enemy::Enemy(const std::string mesh_name, const glm::vec3& color, int initial_li
 	this->lives_left = initial_lives;
 	this->size = DEFAULT_ENEMY_SIZE;
 }
+
 
 Enemy::~Enemy() {
 
@@ -76,6 +63,14 @@ void Enemy::PerformShrink(float deltaTimeSeconds)
 	this->x_speed *= 2;
 	this->y_speed *= 2;
 	this->setColor(firebrick);
+}
+
+int Enemy::getScorePoints(void)
+{
+	if (lives_left == 0) {
+		return initial_lives;
+	}
+	return 0;
 }
 
 void Enemy::TakeDamage(int damage)

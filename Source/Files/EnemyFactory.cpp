@@ -17,7 +17,7 @@ std::unique_ptr<Enemy> EnemyFactory::createEnemy(EnemyType type)
 		return std::make_unique<StrongEnemy>();
 		break;
 	case EnemyType::ET_BOSS:
-		return std::make_unique<BossEnemy>();
+		return std::make_unique<BossEnemy>(BOSS_ENEMY_SIZE);
 		break;
 	default:
 		throw new EnemyTypeNotFoundException();

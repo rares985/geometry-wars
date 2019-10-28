@@ -21,7 +21,7 @@
 #define PROJECTILE_SIZE				0.1f
 #define DEFAULT_ENEMY_SIZE			0.3f
 #define SHRINKED_ENEMY_SIZE			0.3f
-#define BOSS_ENEMY_SIZE				0.8f
+#define BOSS_ENEMY_SIZE				0.45f
 #define LIVES_SIZE					0.2f
 #define LIFE_POWERUP_SIZE			0.2f
 #define FREEZE_POWERUP_SIZE			0.15f
