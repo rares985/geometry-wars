@@ -8,7 +8,7 @@
 Enemy::Enemy(int enemy_type) {
 	if (enemy_type == 1) {
 		this->mesh_name = WEAK_ENEMY_SHIP_MESH_NAME;
-		this->setColor(deepskyblue);
+		this->color = deepskyblue;
 	}
 	else {
 		this->mesh_name = STRONG_ENEMY_SHIP_MESH_NAME;
@@ -17,7 +17,15 @@ Enemy::Enemy(int enemy_type) {
 	this->setSize(DEFAULT_ENEMY_SIZE);
 	this->initial_lives = enemy_type; /* Ugly hack, TODO remove */
 	this->lives_left = this->initial_lives;
+}
 
+Enemy::Enemy(const std::string mesh_name, const glm::vec3& color, int initial_lives)
+{
+	this->mesh_name = mesh_name;
+	this->color = color;
+	this->initial_lives = initial_lives;
+	this->lives_left = initial_lives;
+	this->size = DEFAULT_ENEMY_SIZE;
 }
 
 Enemy::~Enemy() {

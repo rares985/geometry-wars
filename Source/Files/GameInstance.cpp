@@ -1,6 +1,7 @@
 #include <iostream>
 #include "GameInstance.h"
 #include "constants.h"
+#include "EnemyFactory.h"
 
 GameInstance::GameInstance() {
 	this->score = 0;
@@ -71,8 +72,10 @@ void GameInstance::SpawnEnemies() {
 		/* Convert from angle to distance */
 		polar_pos *= ENEMY_SPAWN_DISTANCE;
 
-		int enemy_type = (rand() % 2) + 1;
-		std::unique_ptr<Enemy> enemy(new Enemy(enemy_type));
+		EnemyType type = EnemyType(rand() % (int)EnemyType::ET_MAX_NO);
+
+		std::unique_ptr<Enemy> enemy = EnemyFactory::createEnemy(type);
+
 
 		enemy->setInitialPosition(player_pos + polar_pos);
 		enemy->MoveTowards(player_pos);

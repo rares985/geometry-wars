@@ -5,10 +5,13 @@
 
 #include "GameObject.h"
 
+
+
 class Enemy : public GameObject {
 
 public:
 	Enemy(int enemy_type);
+	Enemy(const std::string mesh_name, const glm::vec3& color, int initial_lives);
 	~Enemy();
 
 	void	HandleCollisionWith(Enemy& enemy) override;

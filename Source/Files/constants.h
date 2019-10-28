@@ -10,6 +10,7 @@
 #define PROJECTILE_MESH_NAME			"projectile"
 #define WEAK_ENEMY_SHIP_MESH_NAME		"weak_enemy_ship"
 #define STRONG_ENEMY_SHIP_MESH_NAME		"strong_enemy_ship"
+#define BOSS_ENEMY_SHIP_MESH_NAME		"boss_enemy_ship"
 #define SHRINKED_ENEMY_SHIP_MESH_NAME	"shrinked_enemy_ship"
 #define LIVES_INDICATOR_MESH_NAME		"lives"
 #define LIFE_POWERUP_MESH_NAME			"life"
@@ -20,6 +21,7 @@
 #define PROJECTILE_SIZE				0.1f
 #define DEFAULT_ENEMY_SIZE			0.3f
 #define SHRINKED_ENEMY_SIZE			0.3f
+#define BOSS_ENEMY_SIZE				0.8f
 #define LIVES_SIZE					0.2f
 #define LIFE_POWERUP_SIZE			0.2f
 #define FREEZE_POWERUP_SIZE			0.15f
@@ -57,5 +59,6 @@
 #define darkcyan					glm::vec3(0, 0.545098, 0.545098)
 #define forestgreen					glm::vec3(0.133333, 0.545098, 0.133333)
 #define ivory						glm::vec3(1, 1, 0.941176)
+#define pink						glm::vec3(0.7, 0, 0.4)
 
 #endif /* CONSTANTS_H_ */
