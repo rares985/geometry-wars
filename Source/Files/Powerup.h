@@ -10,6 +10,7 @@ class Powerup : public GameObject {
 public:
 
 	Powerup(int type);
+	Powerup(const std::string mesh_name, const glm::vec3 color, int size) : GameObject(mesh_name, color, size) {};
 	~Powerup();
 
 	void	HandleCollisionWith(Enemy& enemy) override;
@@ -19,7 +20,6 @@ public:
 
 private:
 
-	int		type;
 };
 
 #endif /* POWERUP_H_ */

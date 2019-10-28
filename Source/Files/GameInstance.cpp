@@ -2,6 +2,7 @@
 #include "GameInstance.h"
 #include "constants.h"
 #include "EnemyFactory.h"
+#include "PowerupFactory.h"
 
 GameInstance::GameInstance() {
 	this->score = 0;
@@ -93,12 +94,11 @@ void GameInstance::SpawnEnemies() {
 
 void GameInstance::SpawnPowerup() {
 
-	int powerup_type = (rand() % 2 + 1);
-
 	float x_pos = (float)(rand() % LOGIC_WINDOW_WIDTH);
 	float y_pos = (float)(rand() % LOGIC_WINDOW_HEIGHT);
 
-	std::unique_ptr<Powerup> powerup(new Powerup(powerup_type));
+	PowerupType type = PowerupType(rand() % (int)PowerupType::PT_MAX_NO);
+	std::unique_ptr<Powerup> powerup = PowerupFactory::createPowerup(type);
 
 	powerup->setCenter(origin);
 	powerup->setInitialPosition(x_pos, y_pos);

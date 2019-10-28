@@ -65,7 +65,7 @@ void Enemy::PerformShrink(float deltaTimeSeconds)
 	this->setColor(firebrick);
 }
 
-int Enemy::getScorePoints(void)
+int Enemy::getScorePoints(void) const
 {
 	if (lives_left == 0) {
 		return initial_lives;

@@ -14,9 +14,6 @@ class GameObject {
 
 	public:
 		
-		GameObject();
-		~GameObject();
-
 		float			rotation;
 		float			x_speed;
 		float			y_speed;
@@ -66,7 +63,12 @@ private:
 
 
 
+
 protected:
+	GameObject(const std::string mesh_name, const glm::vec3 color, int size) : mesh_name(mesh_name), color(color), size(size) {};
+	GameObject();
+	~GameObject();
+
 	bool				visible;
 
 	float				tx;

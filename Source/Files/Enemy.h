@@ -20,7 +20,7 @@ public:
 
 	void	UpdatePosition(float speed_cuantif);
 	void	PerformShrink(float deltaTimeSeconds);
-	int		getScorePoints(void);
+	int		getScorePoints(void) const;
 
 private:
 	void	TakeDamage(int damage);
