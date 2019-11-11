@@ -5,10 +5,12 @@
 
 #include "GameObject.h"
 
+
+
 class Enemy : public GameObject {
 
 public:
-	Enemy(int enemy_type);
+	Enemy(const std::string mesh_name, const glm::vec3& color, int initial_lives);
 	~Enemy();
 
 	void	HandleCollisionWith(Enemy& enemy) override;
@@ -18,6 +20,7 @@ public:
 
 	void	UpdatePosition(float speed_cuantif);
 	void	PerformShrink(float deltaTimeSeconds);
+	int		getScorePoints(void) const;
 
 private:
 	void	TakeDamage(int damage);

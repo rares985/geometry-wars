@@ -14,9 +14,6 @@ class GameObject {
 
 	public:
 		
-		GameObject();
-		~GameObject();
-
 		float			rotation;
 		float			x_speed;
 		float			y_speed;
@@ -63,18 +60,25 @@ class GameObject {
 		virtual void	HandleCollisionWith(Powerup&	powerup)	= 0;
 
 private:
-	float				size;
-	glm::vec3			color;
+
+
+
 
 protected:
+	GameObject(const std::string mesh_name, const glm::vec3 color, int size) : mesh_name(mesh_name), color(color), size(size) {};
+	GameObject();
+	~GameObject();
+
 	bool				visible;
 
 	float				tx;
 	float				ty;
 	float				scale;
+	float				size;
 
 	std::string			mesh_name;
 	glm::vec3			center;
+	glm::vec3			color;
 
 };
 

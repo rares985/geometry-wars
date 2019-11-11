@@ -1,6 +1,8 @@
 #include <iostream>
 #include "GameInstance.h"
 #include "constants.h"
+#include "EnemyFactory.h"
+#include "PowerupFactory.h"
 
 GameInstance::GameInstance() {
 	this->score = 0;
@@ -23,9 +25,11 @@ GameInstance::~GameInstance() {
 }
 
 void GameInstance::UpdateScore(int diff) {
-	this->score += diff;
 
-	printf("Score: %llu\n", this->score);
+	if (diff != 0) {
+		this->score += diff;
+		printf("Score: %llu\n", this->score);
+	}
 }
 
 void GameInstance::UpdateTimers(float deltaTimeSeconds) {
@@ -71,8 +75,10 @@ void GameInstance::SpawnEnemies() {
 		/* Convert from angle to distance */
 		polar_pos *= ENEMY_SPAWN_DISTANCE;
 
-		int enemy_type = (rand() % 2) + 1;
-		std::unique_ptr<Enemy> enemy(new Enemy(enemy_type));
+		EnemyType type = EnemyType(rand() % (int)EnemyType::ET_MAX_NO);
+
+		std::unique_ptr<Enemy> enemy = EnemyFactory::createEnemy(type);
+
 
 		enemy->setInitialPosition(player_pos + polar_pos);
 		enemy->MoveTowards(player_pos);
@@ -88,12 +94,11 @@ void GameInstance::SpawnEnemies() {
 
 void GameInstance::SpawnPowerup() {
 
-	int powerup_type = (rand() % 2 + 1);
-
 	float x_pos = (float)(rand() % LOGIC_WINDOW_WIDTH);
 	float y_pos = (float)(rand() % LOGIC_WINDOW_HEIGHT);
 
-	std::unique_ptr<Powerup> powerup(new Powerup(powerup_type));
+	PowerupType type = PowerupType(rand() % (int)PowerupType::PT_MAX_NO);
+	std::unique_ptr<Powerup> powerup = PowerupFactory::createPowerup(type);
 
 	powerup->setCenter(origin);
 	powerup->setInitialPosition(x_pos, y_pos);
@@ -115,6 +120,8 @@ void GameInstance::EraseInvisibleEntities()
 			(*it)->MakeInvisible();
 		}
 	}
+
+	std::for_each(enemies.begin(), enemies.end(), [this](const std::unique_ptr < Enemy> & enemy) {UpdateScore(enemy->getScorePoints()); });
 
 	projectiles.remove_if([](const std::unique_ptr<Projectile>& proj) { return !(*proj).IsVisible(); });
 	enemies.remove_if([](const std::unique_ptr <Enemy> &enemy) { return !(*enemy).IsVisible();  });

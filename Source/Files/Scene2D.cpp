@@ -38,6 +38,7 @@ Scene2D::~Scene2D()
 	delete meshes[LIVES_INDICATOR_MESH_NAME];
 	delete meshes[LIFE_POWERUP_MESH_NAME];
 	delete meshes[FREEZE_POWERUP_MESH_NAME];
+	delete meshes[BOSS_ENEMY_SHIP_MESH_NAME];
 
 }
 
@@ -64,6 +65,7 @@ void Scene2D::Init()
 	Mesh* lives_mesh = Object2D::GetLifeIndicatorMesh(LIVES_INDICATOR_MESH_NAME,origin,LIVES_SIZE, ivory,true);
 	Mesh* life_powerup_mesh = Object2D::GetLifePowerupMesh(LIFE_POWERUP_MESH_NAME, origin, LIFE_POWERUP_SIZE, forestgreen, true);
 	Mesh* freeze_powerup_mesh = Object2D::GetFreezePowerupMesh(FREEZE_POWERUP_MESH_NAME, origin, FREEZE_POWERUP_SIZE, aquamarine, true);
+	Mesh* boss_enemy_mesh = Object2D::GetShipMesh(BOSS_ENEMY_SHIP_MESH_NAME, origin, BOSS_ENEMY_SIZE, pink, true);
 
 	AddMeshToList(player_mesh);
 	AddMeshToList(projectile_mesh);
@@ -73,6 +75,7 @@ void Scene2D::Init()
 	AddMeshToList(lives_mesh);
 	AddMeshToList(life_powerup_mesh);
 	AddMeshToList(freeze_powerup_mesh);
+	AddMeshToList(boss_enemy_mesh);
 
 	player.setInitialPosition(logic_space_ptr->width / 2, logic_space_ptr->height / 2);
 
