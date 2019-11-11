@@ -26,14 +26,6 @@ bool GameObject::CollidesWith(const GameObject &other) {
 
 	if (visible && other.IsVisible()) {
 
-		//glm::vec2 dist = glm::vec2(tx, ty) - other.getPosition();
-
-		//float abs_dist = glm::dot(dist, dist);
-		
-		//float radii_dist = (size + other.getSize()) * (size + other.getSize());
-
-		//objects_collide = (abs_dist <= radii_dist);
-
 		objects_collide = (glm::distance(glm::vec2(tx, ty), other.getPosition()) <= size + other.getSize());
 	}
 
